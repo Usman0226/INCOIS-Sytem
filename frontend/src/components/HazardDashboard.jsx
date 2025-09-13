@@ -17,26 +17,25 @@ const hoursAgo = (h) => new Date(Date.now() - h * 60 * 60 * 1000).toISOString();
 
 const SEVERITIES = ["Critical", "High", "Moderate", "Low"];
 const HAZ_TYPES = ["Tsunami waves", "Storm surge", "High wave conditions", "Marine weather", "Coastal erosion"];
-const STATUSES = ["verified", "unverified", "flagged", "dismissed"];
+const STATUSES = ["Verified", "UnVerified", "Flagged", "Dismissed"];
 const ZONES = ["Administrative", "Oceanographic", "Population-based"];
 const TIME_PRESETS = ["24h", "7d", "Seasonal", "Custom"];
 
 // Sample hazards
 const sampleHazards = [
-  { id: 1, lat: 13.08, lng: 80.27, severity: "Critical", type: "Tsunami waves", status: "unverified", createdAt: hoursAgo(2), zone: "Administrative" },
-  { id: 2, lat: 11.02, lng: 76.96, severity: "High", type: "Storm surge", status: "unverified", createdAt: hoursAgo(1), zone: "Oceanographic" },
-  { id: 3, lat: 19.08, lng: 72.88, severity: "Moderate", type: "High wave conditions", status: "flagged", createdAt: hoursAgo(6), zone: "Population-based" },
-  { id: 4, lat: 9.08,  lng: 79.88, severity: "Low", type: "Coastal erosion", status: "verified", createdAt: hoursAgo(12), validatedAt: hoursAgo(11.5), validatedBy: "scientist@incois", zone: "Administrative" },
-  { id: 5, lat: 12.95, lng: 80.23, severity: "High", type: "Marine weather", status: "unverified", createdAt: minutesAgo(30), zone: "Oceanographic" },
-  { id: 6,  lat: 17.69, lng: 83.23, severity: "High",     type: "Storm surge",          status: "unverified", createdAt: minutesAgo(20), zone: "Oceanographic" },
-  { id: 7,  lat: 9.97,  lng: 76.28, severity: "Moderate", type: "Marine weather",       status: "unverified", createdAt: minutesAgo(55), zone: "Administrative" },
-  { id: 8,  lat: 15.49, lng: 73.82, severity: "Critical", type: "Tsunami waves",         status: "unverified", createdAt: hoursAgo(3),    zone: "Population-based", radiusMeters: 60000 },
-  { id: 9,  lat: 16.98, lng: 82.24, severity: "High",     type: "High wave conditions",  status: "unverified", createdAt: hoursAgo(4),    zone: "Oceanographic" },
-  { id: 10, lat: 20.32, lng: 86.61, severity: "Low",      type: "Coastal erosion",       status: "unverified", createdAt: hoursAgo(5),    zone: "Administrative",   radiusMeters: 9000 },
-  { id: 11, lat: 21.63, lng: 87.51, severity: "Moderate", type: "Marine weather",        status: "unverified", createdAt: minutesAgo(75), zone: "Population-based" },
-  { id: 12, lat: 12.91, lng: 74.85, severity: "High",     type: "Storm surge",           status: "unverified", createdAt: minutesAgo(42), zone: "Oceanographic" }
+  { id: 1, lat: 13.08, lng: 80.27, severity: "Critical", type: "Tsunami waves", status: "UnVerified", createdAt: hoursAgo(2), zone: "Administrative" },
+  { id: 2, lat: 11.02, lng: 76.96, severity: "High", type: "Storm surge", status: "UnVerified", createdAt: hoursAgo(1), zone: "Oceanographic" },
+  { id: 3, lat: 19.08, lng: 72.88, severity: "Moderate", type: "High wave conditions", status: "Flagged", createdAt: hoursAgo(6), zone: "Population-based" },
+  { id: 4, lat: 9.08,  lng: 79.88, severity: "Low", type: "Coastal erosion", status: "Verified", createdAt: hoursAgo(12), validatedAt: hoursAgo(11.5), validatedBy: "scientist@incois", zone: "Administrative" },
+  { id: 5, lat: 12.95, lng: 80.23, severity: "High", type: "Marine weather", status: "UnVerified", createdAt: minutesAgo(30), zone: "Oceanographic" },
+  { id: 6,  lat: 17.69, lng: 83.23, severity: "High",     type: "Storm surge",          status: "UnVerified", createdAt: minutesAgo(20), zone: "Oceanographic" },
+  { id: 7,  lat: 9.97,  lng: 76.28, severity: "Moderate", type: "Marine weather",       status: "UnVerified", createdAt: minutesAgo(55), zone: "Administrative" },
+  { id: 8,  lat: 15.49, lng: 73.82, severity: "Critical", type: "Tsunami waves",         status: "UnVerified", createdAt: hoursAgo(3),    zone: "Population-based", radiusMeters: 60000 },
+  { id: 9,  lat: 16.98, lng: 82.24, severity: "High",     type: "High wave conditions",  status: "UnVerified", createdAt: hoursAgo(4),    zone: "Oceanographic" },
+  { id: 10, lat: 20.32, lng: 86.61, severity: "Low",      type: "Coastal erosion",       status: "UnVerified", createdAt: hoursAgo(5),    zone: "Administrative",   radiusMeters: 9000 },
+  { id: 11, lat: 21.63, lng: 87.51, severity: "Moderate", type: "Marine weather",        status: "UnVerified", createdAt: minutesAgo(75), zone: "Population-based" },
+  { id: 12, lat: 12.91, lng: 74.85, severity: "High",     type: "Storm surge",           status: "UnVerified", createdAt: minutesAgo(42), zone: "Oceanographic" }
 ];
-
 
 // Touch-friendly icon
 const createCircleIcon = (color, size = 30) =>
@@ -48,10 +47,10 @@ const createCircleIcon = (color, size = 30) =>
   });
 
 const statusColors = {
-  verified: "text-green-600",
-  unverified: "text-orange-600",
-  flagged: "text-red-600",
-  dismissed: "text-slate-500"
+  Verified: "text-green-600",
+  UnVerified: "text-orange-600",
+  Flagged: "text-red-600",
+  Dismissed: "text-slate-500"
 };
 
 // Severity → default range (meters)
@@ -240,10 +239,10 @@ export default function HazardDashboard() {
   const iconFor = (status) => {
     const size = isMobile ? 36 : 30;
     const colors = {
-      verified: "#22c55e",
-      unverified: "#f97316",
-      flagged: "#ef4444",
-      dismissed: "#94a3b8"
+      Verified: "#22c55e",
+      UnVerified: "#f97316",
+      Flagged: "#ef4444",
+      Dismissed: "#94a3b8"
     };
     return createCircleIcon(colors[status], size);
   };
@@ -293,15 +292,15 @@ export default function HazardDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtered]);
 
-  const pending = hazards.filter(h => h.status === "unverified");
+  const pending = hazards.filter(h => h.status === "UnVerified");
 
   // Actions
   const verify = (id) =>
-    setHazards(prev => prev.map(h => h.id === id ? { ...h, status: "verified", validatedAt: now(), validatedBy: "scientist@incois" } : h));
+    setHazards(prev => prev.map(h => h.id === id ? { ...h, status: "Verified", validatedAt: now(), validatedBy: "scientist@incois" } : h));
   const flag = (id) =>
-    setHazards(prev => prev.map(h => h.id === id ? { ...h, status: "flagged", validatedAt: now(), validatedBy: "scientist@incois" } : h));
+    setHazards(prev => prev.map(h => h.id === id ? { ...h, status: "Flagged", validatedAt: now(), validatedBy: "scientist@incois" } : h));
   const dismiss = (id) =>
-    setHazards(prev => prev.map(h => h.id === id ? { ...h, status: "dismissed", validatedAt: now(), validatedBy: "scientist@incois" } : h));
+    setHazards(prev => prev.map(h => h.id === id ? { ...h, status: "Dismissed", validatedAt: now(), validatedBy: "scientist@incois" } : h));
 
   const fitAll = () => {
     if (!mapRef.current || !filtered.length) return;
@@ -325,9 +324,13 @@ export default function HazardDashboard() {
         </div>
       </header>
 
-      <div className="flex-1 grid grid-rows-[auto_1fr_auto] md:grid-rows-1 md:grid-cols-[320px_1fr_360px]">
+      {/* Content grid: fixed viewport height below header; only sidebars scroll */}
+      <div
+        className="grid grid-rows-[auto_1fr_auto] md:grid-rows-1 md:grid-cols-[320px_1fr_360px] overflow-hidden"
+        style={{ height: "calc(var(--app-vh, 100dvh) - 48px)" }}
+      >
         {/* Left sidebar (off-canvas on mobile) */}
-        <aside className={`bg-white border-r overflow-y-auto p-4 ${leftOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative`}>
+        <aside className={`bg-white border-r overflow-y-auto p-4 ${leftOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative md:h-full`}>
           {/* Mobile close */}
           <div className="md:hidden flex justify-between items-center mb-3">
             <div className="font-semibold">Filters</div>
@@ -371,7 +374,7 @@ export default function HazardDashboard() {
               <div className="text-xs font-semibold text-slate-500 mb-2">Time Range</div>
               <div className="flex flex-wrap gap-2">
                 {TIME_PRESETS.map(p => (
-                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-white" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
+                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-black" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
                 ))}
               </div>
               {timePreset === "Custom" && (
@@ -406,13 +409,8 @@ export default function HazardDashboard() {
         </aside>
 
         {/* Map */}
-        <main className="relative">
-          <div
-            style={{
-              height: "calc(var(--app-vh, 100dvh) - 48px)"
-            }}
-            className="md:h-full"
-          >
+        <main className="relative md:h-full md:overflow-hidden">
+          <div style={{ height: "100%" }} className="h-full">
             <MapContainer
               center={[12.97, 80.23]}
               zoom={6}
@@ -453,7 +451,7 @@ export default function HazardDashboard() {
         </main>
 
         {/* Right panel (off-canvas on mobile) */}
-        <aside className={`bg-white border-l overflow-y-auto p-4 ${rightOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative`}>
+        <aside className={`bg-white border-l overflow-y-auto p-4 ${rightOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative md:h-full`}>
           <div className="md:hidden flex justify-between items-center mb-3">
             <div className="font-semibold">Validation Queue</div>
             <button onClick={() => setRightOpen(false)} className="px-2 py-1 bg-slate-200 rounded">Close</button>
@@ -467,7 +465,7 @@ export default function HazardDashboard() {
               <div className="mt-2 flex flex-wrap gap-2">
                 <button onClick={() => verify(q.id)} className="px-2 py-1 bg-green-600 text-black rounded text-xs">Verify</button>
                 <button onClick={() => flag(q.id)} className="px-2 py-1 bg-yellow-500 text-black rounded text-xs">Flag</button>
-                <button onClick={() => dismiss(q.id)} className="px-2 py-1 bg-slate-200 rounded text-xs">Dismiss</button>
+                <button onClick={() => dismiss(q.id)} className="px-2 py-1 bg-slate-200 text-black rounded text-xs">Dismiss</button>
               </div>
             </div>
           ))}
