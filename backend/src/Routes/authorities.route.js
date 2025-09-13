@@ -6,7 +6,7 @@ const router = express.Router()
 
 // auth
 router.post('/authority/login',authController.loginAuthority)
-router.post('/auth/register',authController.registerScientist)
+router.post('/authority/register',authController.registerScientist)
 
 
 module.exports = router

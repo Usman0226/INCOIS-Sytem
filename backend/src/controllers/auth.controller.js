@@ -167,8 +167,8 @@ const registerScientist = async (req, res) => {
 
     const token = jwt.sign(
       {id : scientist.id},
-      process.env.JWT_SECRET,
-      {expiresIn : process.env.JWT_EXPIRES_IN}
+      process.env.JWT_SECRET||"itisasecretkey",
+      {expiresIn : process.env.JWT_EXPIRES_IN || "7d"}
     )
 
     res.cookie('token',token,{
@@ -181,7 +181,7 @@ const registerScientist = async (req, res) => {
 
 
   } catch (error) {
-    console.log("at registering the scientist " ,error)
+    console.log("at registering scientist " ,error)
   }
 };
 
@@ -207,7 +207,7 @@ const loginAuthority = async (req, res) => {
 
     const token = jwt.sign(
       { scientistId: scientist._id, email: scientist.email },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "itisasecretkey",
       { expiresIn: "7d" }
     );
 
