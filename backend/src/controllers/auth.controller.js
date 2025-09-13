@@ -1,5 +1,7 @@
 const User = require("../models/User");
+const Scientist = require("../models/Scientist");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -43,7 +45,9 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "At the auth controller Internal server error" });
+    res
+      .status(500)
+      .json({ message: "At the auth controller Internal server error" });
   }
 };
 
@@ -79,6 +83,8 @@ const verifyOTP = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
+
+    res.cookies("token", token);
 
     res.status(200).json({
       message: "OTP Verified successfully",
@@ -130,15 +136,96 @@ const resendOTP = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { phone } = req.body;
-    let phoneExist = await User.findOne(phone);
+    let phoneExist = await User.findOne({ phone });
 
     if (!phoneExist) {
-      res.status(401).json({ message: "User doesn't exist !" });
+      return res.status(401).json({ message: "User doesn't exist !" });
     }
 
-    res.status(200).json({ message: "User logged in successfully" });
+    return res.status(200).json({ message: "User logged in successfully" });
   } catch (err) {
-        res.status(500).json({message :'Login Error , try again or signup !'})
+    res.status(500).json({ message: "Login Error , try again or signup !" });
+  }
+};
+
+const registerScientist = async (req, res) => {
+  try {
+    const { name, email, password, organization } = req.body;
+
+    if (!name || !email || !password || !organization) {
+      return res.status(400).json({ message: "Provide all details !" });
+    }
+
+    const hashedPass = await bcrypt.hash(password, 10);
+
+    const scientist = await Scientist.create({
+      name,
+      email,
+      password: hashedPass,
+      organization,
+    });
+
+    const token = jwt.sign(
+      {id : scientist.id},
+      process.env.JWT_SECRET,
+      {expiresIn : process.env.JWT_EXPIRES_IN}
+    )
+
+    res.cookie('token',token,{
+      httpOnly : true,
+      secure : true,
+      maxAge : 15 * 24 * 3600 * 1000 
+    })
+    
+    res.status(200).json({message : "Scientist registration completed ! "})
+
+
+  } catch (error) {
+    console.log("at registering the scientist " ,error)
+  }
+};
+
+const loginAuthority = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    const scientist = await Scientist.findOne({ email });
+    if (!scientist) {
+      return res.status(400).json({ message: "Email not found ! " });
+    }
+
+    const passcheck = await bcrypt.compare(password, scientist.password);
+    if (!passcheck) {
+      return res.status(401).json({ message: "password didn't match !" });
+    }
+
+    const token = jwt.sign(
+      { scientistId: scientist._id, email: scientist.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res
+      .status(200)
+      .json({ 
+        message: "Email found, login successfull !",
+        token: token,
+        scientist: {
+          id: scientist._id,
+          name: scientist.name,
+          email: scientist.email,
+          organization: scientist.organization
+        }
+      });
+  } catch (err) {
+    console.log(`In login auth : ${err}`);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -147,4 +234,6 @@ module.exports = {
   verifyOTP,
   resendOTP,
   loginUser,
+  loginAuthority,
+  registerScientist,
 };

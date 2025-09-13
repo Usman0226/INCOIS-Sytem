@@ -8,11 +8,11 @@ const validateReport = async (req, res) => {
     image_url: image_url,
     video_url: video_url,
     lat: lat,
-    us,
+    lon: lon,
   };
 
   if (!text && !image_url) {
-    return res.status(400).json({ message: "Image and text are complem" });
+    return res.status(400).json({ message: "Image and text are necessary !  " });
   }
 
   if (!video_url || !lat || !lon) {
@@ -21,10 +21,10 @@ const validateReport = async (req, res) => {
       .json({ message: "Insufficeint data to submit report !" });
   }
 
-  const dups = Report.find({
-    lat,
-    lon,
-  });
+//   const dups = Report.find({
+//     lat,
+//     lon,
+//   });
 
 
   await Report.create(reportData);
