@@ -1,0 +1,150 @@
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const register = async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    if (!name || !phone) {
+      return res.status(400).json({ message: "Name and phone are required" });
+    }
+
+    let user = await User.findOne({ phone });
+
+    if (user) {
+      const otp = generateOTP();
+      const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+      user.otp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+
+      return res.status(200).json({
+        message: "OTP sent to existing user",
+        phone: user.phone,
+        otp: otp,
+      });
+    }
+
+    // Create new user
+    const otp = generateOTP();
+    user = await User.create({
+      name,
+      phone,
+    });
+
+    res.status(201).json({
+      message: "User created & OTP sent",
+      phone: user.phone,
+      otp: otp,
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "At the auth controller Internal server error" });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+
+    if (!phone || !otp) {
+      return res.status(400).json({ message: "Phone and OTP are required" });
+    }
+
+    const user = await User.findOne({ phone });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    if (user.otpExpires < new Date()) {
+      return res.status(401).json({ message: "OTP has expired" });
+    }
+
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpires = null;
+    await user.save();
+
+    const token = jwt.sign(
+      { userId: user._id, phone: user.phone },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "OTP verified successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        phone: user.phone,
+        isVerified: user.isVerified,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const resendOTP = async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ message: "Phone number is required" });
+    }
+
+    const user = await User.findOne({ phone });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    res.status(200).json({
+      message: "OTP resent successfully",
+      phone: user.phone,
+    });
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const loginUser = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    let phoneExist = await User.findOne(phone);
+
+    if (!phoneExist) {
+      res.status(401).json({ message: "User doesn't exist !" });
+    }
+
+    res.status(200).json({ message: "User logged in successfully" });
+  } catch (err) {
+        res.status(500).json({message :'Login Error , try again or signup !'})
+  }
+};
+
+module.exports = {
+  register,
+  verifyOTP,
+  resendOTP,
+  loginUser,
+};
