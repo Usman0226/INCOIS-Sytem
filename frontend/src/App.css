@@ -1,9 +1,17 @@
-#root {
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+} */
+/* app.css */
+#root {
+  /* Remove width cap and padding that break full-viewport layouts */
+  max-width: none;     /* was: 1280px */
+  padding: 0;          /* was: 2rem */
+  text-align: initial; /* avoid centering all descendants */
 }
+
 
 .logo {
   height: 6em;
