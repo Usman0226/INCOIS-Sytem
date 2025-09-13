@@ -7,6 +7,7 @@ const authenticateToken = require('../middleware/auth')
 router.post('/user/register',authController.register)
 router.post('/verify-otp',authController.verifyOTP)
 router.post('/resend-otp',authController.resendOTP)
+router.post('/user/login',authController.loginUser)
 
 
 module.exports = router;

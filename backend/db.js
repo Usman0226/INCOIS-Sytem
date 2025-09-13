@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const connetDB = async ()=>{
+const connectDB = async ()=>{
     try {
         await mongoose.connect('mongodb://localhost:27017/INCOIS')
         console.log("DB connected !");
@@ -10,4 +10,4 @@ const connetDB = async ()=>{
     }
 }
 
-module.exports = connetDB
+module.exports = connectDB

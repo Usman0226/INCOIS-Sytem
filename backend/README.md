@@ -31,33 +31,73 @@ npm start
 
 ## API Endpoints
 
-### Authentication
+### Complete API Reference Table
 
-#### Register User
-- **POST** `/api/auth/register`
-- **Body**: `{ "name": "John Doe", "phone": "1234567890" }`
-- **Response**: Returns OTP (in development) or success message
+| Method | Endpoint | Description | Authentication | Request Body | Response |
+|--------|----------|-------------|----------------|--------------|----------|
+| POST | `/api/auth/user/register` | Register a new user with phone number | No | `{ "name": "string", "phone": "string" }` | `{ "message": "string", "phone": "string", "otp": "string" }` |
+| POST | `/api/auth/verify-otp` | Verify OTP for user registration | No | `{ "phone": "string", "otp": "string" }` | `{ "message": "string", "user": "object", "token": "string" }` |
+| POST | `/api/auth/resend-otp` | Resend OTP to user's phone | No | `{ "phone": "string" }` | `{ "message": "string", "phone": "string" }` |
+| POST | `/api/auth/user/login` | Login existing user | No | `{ "phone": "string" }` | `{ "message": "string" }` |
+| POST | `/auth/authority/login` | Login for authorities/scientists | No | `{ "email": "string", "password": "string" }` | `{ "message": "string" }` |
+| POST | `/auth/auth/register` | Register new scientist/authority | No | `{ "name": "string", "email": "string", "password": "string", "organization": "string" }` | `{ "message": "string" }` |
+| POST | `/user/submit/report` | Submit incident report | Yes (JWT) | `{ "text": "string", "image_url": "string", "video_url": "string", "lat": "number", "lon": "number" }` | `{ "message": "string", "data": "object" }` |
 
-#### Verify OTP
-- **POST** `/api/auth/verify-otp`
-- **Body**: `{ "phone": "1234567890", "otp": "123456" }`
-- **Response**: Returns JWT token and user data
+### Authentication Endpoints
 
-#### Resend OTP
-- **POST** `/api/auth/resend-otp`
-- **Body**: `{ "phone": "1234567890" }`
-- **Response**: Returns new OTP (in development)
+#### User Registration & Verification
+- **POST** `/api/auth/user/register` - Register a new user with phone number
+- **POST** `/api/auth/verify-otp` - Verify OTP for user registration  
+- **POST** `/api/auth/resend-otp` - Resend OTP to user's phone
+- **POST** `/api/auth/user/login` - Login existing user
 
-#### Get User Profile (Protected)
-- **GET** `/api/auth/profile`
-- **Headers**: `Authorization: Bearer <token>`
-- **Response**: Returns user profile data
+#### Authority/Scientist Authentication
+- **POST** `/auth/authority/login` - Login for authorities/scientists
+- **POST** `/auth/auth/register` - Register new scientist/authority
 
-### Health Check
+### Protected Endpoints
 
-#### Server Status
-- **GET** `/health`
-- **Response**: Returns server status and timestamp
+#### Report Submission
+- **POST** `/user/submit/report` - Submit incident report (Rate limited: 5 requests per 10 minutes)
+
+### Request/Response Examples
+
+#### User Registration
+```bash
+POST /api/auth/user/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "phone": "1234567890"
+}
+```
+
+#### OTP Verification
+```bash
+POST /api/auth/verify-otp
+Content-Type: application/json
+
+{
+  "phone": "1234567890",
+  "otp": "123456"
+}
+```
+
+#### Report Submission
+```bash
+POST /user/submit/report
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+
+{
+  "text": "Incident description",
+  "image_url": "https://example.com/image.jpg",
+  "video_url": "https://example.com/video.mp4",
+  "lat": 12.9716,
+  "lon": 77.5946
+}
+```
 
 ## Environment Variables
 

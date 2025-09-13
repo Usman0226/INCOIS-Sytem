@@ -3,7 +3,7 @@ const express = require("express");
 const rateLimit = require("express-rate-limit");
 
 const router = express.Router();
-const {validateReport} = require("../controllers/user.controller")
+const validateReport = require("../controllers/user.controller")
 
 const reportLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, 
