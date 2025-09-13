@@ -81,7 +81,7 @@ const verifyOTP = async (req, res) => {
     );
 
     res.status(200).json({
-      message: "OTP verified successfully",
+      message: "OTP Verified successfully",
       user: {
         id: user._id,
         name: user.name,
