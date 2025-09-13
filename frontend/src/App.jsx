@@ -6,8 +6,6 @@ import './App.css'
 import LoginPage from './components/login'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
       <LoginPage/>
