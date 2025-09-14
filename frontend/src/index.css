@@ -23,7 +23,7 @@ body {
 
 :root {
   color-scheme: light dark;
-  color: #213547;
+  /* color: #213547; */
   background-color: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;

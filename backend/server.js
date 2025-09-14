@@ -3,7 +3,12 @@ const connectDB = require('./db')
 
 const port = process.env.PORT || 3000;
 
-connectDB()
+
+try{
+    connectDB()
+}catch(error){
+    console.log("Error at DB connection !",error)
+}
 
 app.listen(port, () => {
     console.log(`Server is running on port http://localhost:${port}`);

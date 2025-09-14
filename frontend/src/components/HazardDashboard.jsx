@@ -113,7 +113,8 @@ function useViewportHeightVar() {
 }
 
 // Heatmap Overlay
-function HeatmapOverlay({ points, radius = 25, blur = 15, maxZoom = 12 }) {
+// MODIFIED: Increased default radius and blur for better visibility
+function HeatmapOverlay({ points, radius = 40, blur = 25, maxZoom = 12 }) {
   const map = useMap();
   const layerRef = useRef(null);
 
@@ -195,11 +196,12 @@ function RangeCircles({ hazards }) {
     hazards.forEach(h => {
       const radius = h.radiusMeters ?? severityRadiusMeters(h.severity);
       const circle = L.circle([h.lat, h.lng], {
-        radius,                // meters
-        color: "#0ea5e9",
-        fillColor: "#0ea5e9",
-        fillOpacity: 0.15,
-        weight: 1,
+        radius,                 // meters
+        // MODIFIED: Stronger color, thicker border, more opaque fill for visibility
+        color: "#ef4444",       // Red-500
+        fillColor: "#ef4444",
+        fillOpacity: 0.2,
+        weight: 2,
       });
       circle.bindPopup(
         `<div class="text-xs">
@@ -528,7 +530,7 @@ export default function HazardDashboard() {
               <div className="text-xs font-semibold text-slate-500 mb-2">Time Range</div>
               <div className="flex flex-wrap gap-2">
                 {TIME_PRESETS.map(p => (
-                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-black" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
+                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-white" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
                 ))}
               </div>
               {timePreset === "Custom" && (
@@ -621,9 +623,11 @@ export default function HazardDashboard() {
               <div className="font-semibold text-red-600">{q.severity}</div>
               <div className="text-sm">{q.type} • {new Date(q.createdAt).toLocaleString()}</div>
               <div className="mt-2 flex flex-wrap gap-2">
-                <button onClick={(e) => verify(q.id, e)} className="px-2 py-1 bg-green-600 text-black rounded text-xs">Verify</button>
-                <button onClick={(e) => flag(q.id, e)} className="px-2 py-1 bg-yellow-500 text-black rounded text-xs">Flag</button>
-                <button onClick={(e) => dismiss(q.id, e)} className="px-2 py-1 bg-slate-200 text-black rounded text-xs">Dismiss</button>
+                 {/* MODIFIED: Changed text-black to text-white for better contrast */}
+                <button onClick={(e) => verify(q.id, e)} className="px-2 py-1 bg-green-600 text-white rounded text-xs">Verify</button>
+                {/* MODIFIED: Changed color to red and text to white for clarity and contrast */}
+                <button onClick={(e) => flag(q.id, e)} className="px-2 py-1 bg-red-600 text-white rounded text-xs">Flag</button>
+                <button onClick={(e) => dismiss(q.id, e)} className="px-2 py-1 bg-slate-200 text-white rounded text-xs">Dismiss</button>
               </div>
             </div>
           ))}
