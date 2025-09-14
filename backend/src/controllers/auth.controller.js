@@ -185,7 +185,7 @@ const registerScientist = async (req, res) => {
   }
 };
 
-const loginAuthority = async (req, res) => {
+const loginAuthority = async (req, res) => {  
   try {
     const { email, password } = req.body;
 

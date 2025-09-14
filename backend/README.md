@@ -126,3 +126,5 @@ Content-Type: application/json
 - In production, implement proper SMS service for OTP delivery
 - Use strong JWT secrets in production
 - Implement rate limiting for OTP requests
+
+## 

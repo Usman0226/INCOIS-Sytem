@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Loader from "./loader";
 
 import axios from "axios";
 
@@ -25,15 +26,12 @@ export default function Login({ onLogin }) {
         }
       );
 
-      if (res.status == 200) {
-        navigate("/Dashboard");
-      }
-
       const { token, scientist, message } = res.data;
 
-      if (token) {
+      if (res.status === 200 && token) {
         localStorage.setItem("token", token);
         onLogin(scientist);
+        navigate("/Dashboard");
       } else {
         setError("Login failed. Try again.");
       }

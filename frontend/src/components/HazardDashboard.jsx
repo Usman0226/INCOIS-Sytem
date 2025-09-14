@@ -232,23 +232,23 @@ function ReportModal({ open, hazard, onClose }) {
   const renderAttachment = (att, i) => {
     if (att.type === "image" && att.url) {
       return (
-        <div key={i} className="rounded overflow-hidden border">
+        <div key={i} className="rounded overflow-hidden border border-slate-200">
           <img src={att.url} alt={`image-${i}`} className="w-full h-auto object-cover" />
-          <div className="px-2 py-1 text-xs text-slate-600">{att.mime || "image"}</div>
+          <div className="px-2 py-1 text-xs text-slate-600 bg-slate-50">{att.mime || "image"}</div>
         </div>
       );
     }
     if (att.type === "video" && att.url) {
       return (
-        <div key={i} className="rounded overflow-hidden border">
+        <div key={i} className="rounded overflow-hidden border border-slate-200">
           <video src={att.url} controls className="w-full h-auto" />
-          <div className="px-2 py-1 text-xs text-slate-600">{att.mime || "video"}</div>
+          <div className="px-2 py-1 text-xs text-slate-600 bg-slate-50">{att.mime || "video"}</div>
         </div>
       );
     }
     if (att.type === "audio" && att.url) {
       return (
-        <div key={i} className="rounded overflow-hidden border p-2">
+        <div key={i} className="rounded border border-slate-200 p-2 bg-slate-50">
           <audio src={att.url} controls className="w-full" />
           <div className="px-1 pt-1 text-xs text-slate-600">{att.mime || "audio"}</div>
         </div>
@@ -256,16 +256,16 @@ function ReportModal({ open, hazard, onClose }) {
     }
     if (att.type === "text" && att.content) {
       return (
-        <div key={i} className="rounded border p-2 bg-slate-50">
-          <div className="text-xs text-slate-500 mb-1">Text</div>
-          <p className="text-sm whitespace-pre-wrap">{att.content}</p>
+        <div key={i} className="rounded border border-slate-200 p-3 bg-slate-50">
+          <div className="text-xs text-slate-600 mb-2 font-medium">Text</div>
+          <p className="text-sm text-slate-800 whitespace-pre-wrap">{att.content}</p>
         </div>
       );
     }
     return (
-      <div key={i} className="rounded border p-2">
-        <div className="text-sm">Unsupported attachment</div>
-      </div>
+        <div key={i} className="rounded border border-slate-200 p-2 bg-slate-50">
+          <div className="text-sm text-slate-600">Unsupported attachment</div>
+        </div>
     );
   };
 
@@ -275,35 +275,35 @@ function ReportModal({ open, hazard, onClose }) {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       {/* Panel */}
       <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col">
-        <div className="px-4 py-3 border-b flex items-center justify-between">
-          <div className="font-semibold">Report Details</div>
-          <button className="px-2 py-1 bg-slate-200 rounded" onClick={onClose}>Close</button>
+        <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+          <div className="font-semibold text-slate-800 text-lg">Report Details</div>
+          <button className="px-3 py-1 bg-slate-200 text-slate-800 rounded hover:bg-slate-300 transition-colors font-medium" onClick={onClose}>Close</button>
         </div>
         <div className="p-4 overflow-y-auto space-y-4">
           <div>
-            <div className="text-xs text-slate-500 mb-1">Hazard</div>
-            <div className="font-semibold">{hazard.type} • {hazard.severity}</div>
-            <div className="text-xs text-slate-600">Status: {hazard.status} • Zone: {hazard.zone}</div>
-            <div className="text-xs text-slate-600">Raised: {new Date(hazard.createdAt).toLocaleString()}</div>
+            <div className="text-sm font-semibold text-slate-600 mb-2">Hazard</div>
+            <div className="font-semibold text-slate-800 text-lg mb-2">{hazard.type} • {hazard.severity}</div>
+            <div className="text-sm text-slate-700 mb-1">Status: {hazard.status} • Zone: {hazard.zone}</div>
+            <div className="text-sm text-slate-700 mb-1">Raised: {new Date(hazard.createdAt).toLocaleString()}</div>
             {hazard.radiusMeters && (
-              <div className="text-xs text-slate-600">Range: {(hazard.radiusMeters / 1000).toFixed(0)} km</div>
+              <div className="text-sm text-slate-700 mb-1">Range: {(hazard.radiusMeters / 1000).toFixed(0)} km</div>
             )}
-            <div className="text-xs text-slate-600">Coords: {hazard.lat.toFixed(2)}, {hazard.lng.toFixed(2)}</div>
+            <div className="text-sm text-slate-700">Coords: {hazard.lat.toFixed(2)}, {hazard.lng.toFixed(2)}</div>
           </div>
 
-          <div className="pt-2 border-t space-y-2">
-            <div className="text-xs text-slate-500">User report</div>
+          <div className="pt-3 border-t border-slate-200 space-y-3">
+            <div className="text-sm font-semibold text-slate-700">User Report</div>
             {r ? (
               <>
-                <div className="text-sm"><span className="font-semibold">Name:</span> {r.name}</div>
-                <div className="text-sm"><span className="font-semibold">Contact:</span> {r.contact}</div>
-                <div className="text-sm"><span className="font-semibold">Source:</span> {r.source}</div>
-                <div className="text-sm"><span className="font-semibold">Reported at:</span> {new Date(r.raisedAt).toLocaleString()}</div>
-                {r.notes && <div className="text-sm"><span className="font-semibold">Notes:</span> {r.notes}</div>}
+                <div className="text-sm text-slate-800"><span className="font-semibold text-slate-700">Name:</span> {r.name}</div>
+                <div className="text-sm text-slate-800"><span className="font-semibold text-slate-700">Contact:</span> {r.contact}</div>
+                <div className="text-sm text-slate-800"><span className="font-semibold text-slate-700">Source:</span> {r.source}</div>
+                <div className="text-sm text-slate-800"><span className="font-semibold text-slate-700">Reported at:</span> {new Date(r.raisedAt).toLocaleString()}</div>
+                {r.notes && <div className="text-sm text-slate-800"><span className="font-semibold text-slate-700">Notes:</span> {r.notes}</div>}
 
                 {Array.isArray(r.attachments) && r.attachments.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-xs text-slate-500">Attachments</div>
+                  <div className="space-y-3">
+                    <div className="text-sm font-semibold text-slate-700">Attachments</div>
                     <div className="grid grid-cols-1 gap-3">
                       {r.attachments.map(renderAttachment)}
                     </div>
@@ -311,7 +311,7 @@ function ReportModal({ open, hazard, onClose }) {
                 )}
               </>
             ) : (
-              <div className="text-sm text-slate-600">No user-submitted details available.</div>
+              <div className="text-sm text-slate-600 italic">No user-submitted details available.</div>
             )}
           </div>
         </div>
@@ -344,7 +344,7 @@ function SizeInvalidator({ deps = [] }) {
 }
 
 // ---------------- Main Dashboard ----------------
-export default function HazardDashboard() {
+export default function HazardDashboard({ scientist, onLogout }) {
   useViewportHeightVar();
 
   const [hazards, setHazards] = useState(sampleHazards);
@@ -473,10 +473,21 @@ export default function HazardDashboard() {
           <button className="md:hidden px-2 py-1 bg-slate-200 rounded" onClick={() => setLeftOpen(true)} aria-label="Open filters">Filters</button>
           <h1 className="font-bold text-base md:text-lg text-slate-700">Pro Hazard Dashboard</h1>
         </div>
-        <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm text-slate-700">
-          <span>Filter: {metrics.lastFilterMs} ms</span>
-          <button onClick={fitAll} className="px-2 py-1 bg-slate-200 rounded">Fit</button>
-          <button onClick={() => setRightOpen(true)} className="md:hidden px-2 py-1 bg-slate-200 rounded" aria-label="Open queue">Queue</button>
+        <div className="flex items-center gap-2 md:gap-3 text-sm text-slate-700">
+          <span className="font-medium">Filter: {metrics.lastFilterMs} ms</span>
+          <button onClick={fitAll} className="px-3 py-1 bg-slate-200 text-slate-800 rounded hover:bg-slate-300 transition-colors font-medium">Fit</button>
+          <button onClick={() => setRightOpen(true)} className="md:hidden px-3 py-1 bg-slate-200 text-slate-800 rounded hover:bg-slate-300 transition-colors font-medium" aria-label="Open queue">Queue</button>
+          {scientist && (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-slate-700 font-medium">Welcome, {scientist.name || scientist.email}</span>
+              <button 
+                onClick={onLogout} 
+                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium transition-colors shadow-sm"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -488,77 +499,86 @@ export default function HazardDashboard() {
         {/* Left sidebar (off-canvas on mobile) */}
        <aside className={`bg-white border-r overflow-y-auto p-4 ${leftOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative md:h-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
           {/* Mobile close */}
-          <div className="md:hidden flex justify-between items-center mb-3">
-            <div className="font-semibold">Filters</div>
-            <button onClick={() => setLeftOpen(false)} className="px-2 py-1 bg-slate-200 rounded">Close</button>
+          <div className="md:hidden flex justify-between items-center mb-4">
+            <div className="font-semibold text-slate-800 text-lg">Filters</div>
+            <button onClick={() => setLeftOpen(false)} className="px-3 py-1 bg-slate-200 text-slate-800 rounded hover:bg-slate-300 transition-colors font-medium">Close</button>
           </div>
 
           <div className="space-y-4">
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-1">Severity</div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">Severity</div>
               {SEVERITIES.map(s => (
-                <button key={s} className={`block w-full text-left px-3 py-2 mb-1 rounded ${filter.severities.has(s) ? "bg-sky-100" : "bg-slate-100"}`}
+                <button key={s} className={`block w-full text-left px-3 py-2 mb-1 rounded text-slate-180 font-medium hover:bg-slate-200 transition-colors ${filter.severities.has(s) ? "bg-sky-200 text-sky-900 border border-sky-300" : "bg-slate-100"}`}
                   onClick={() => setFilter(prev => ({ ...prev, severities: toggleSet(prev.severities, s) }))}>{s}</button>
               ))}
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-1">Hazard Type</div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">Hazard Type</div>
               {HAZ_TYPES.map(t => (
-                <button key={t} className={`block w-full text-left px-3 py-2 mb-1 rounded ${filter.types.has(t) ? "bg-sky-100" : "bg-slate-100"}`}
+                <button key={t} className={`block w-full text-left px-3 py-2 mb-1 rounded text-slate-180 font-medium hover:bg-slate-200 transition-colors ${filter.types.has(t) ? "bg-sky-200 text-sky-900 border border-sky-300" : "bg-slate-100"}`}
                   onClick={() => setFilter(prev => ({ ...prev, types: toggleSet(prev.types, t) }))}>{t}</button>
               ))}
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-1">Status</div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">Status</div>
               {STATUSES.map(s => (
-                <button key={s} className={`block w-full text-left px-3 py-2 mb-1 rounded ${filter.statuses.has(s) ? "bg-sky-100" : "bg-slate-100"}`}
+                <button key={s} className={`block w-full text-left px-3 py-2 mb-1 rounded text-slate-180 font-medium hover:bg-slate-200 transition-colors ${filter.statuses.has(s) ? "bg-sky-200 text-sky-900 border border-sky-300" : "bg-slate-100"}`}
                   onClick={() => setFilter(prev => ({ ...prev, statuses: toggleSet(prev.statuses, s) }))}>{s}</button>
               ))}
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-1">Zones</div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">Zones</div>
               {ZONES.map(z => (
-                <button key={z} className={`block w-full text-left px-3 py-2 mb-1 rounded ${filter.zones.has(z) ? "bg-sky-100" : "bg-slate-100"}`}
+                <button key={z} className={`block w-full text-left px-3 py-2 mb-1 rounded text-slate-180 font-medium hover:bg-slate-200 transition-colors ${filter.zones.has(z) ? "bg-sky-200 text-sky-900 border border-sky-300" : "bg-slate-100"}`}
                   onClick={() => setFilter(prev => ({ ...prev, zones: toggleSet(prev.zones, z) }))}>{z}</button>
               ))}
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-2">Time Range</div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">Time Range</div>
               <div className="flex flex-wrap gap-2">
                 {TIME_PRESETS.map(p => (
-                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-white" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
+                  <button key={p} className={`px-3 py-2 rounded font-medium transition-colors ${timePreset === p ? "bg-sky-600 text-white shadow-md" : "bg-slate-200 text-slate-180 hover:bg-slate-300"}`} onClick={() => setTimePreset(p)}>{p}</button>
                 ))}
               </div>
               {timePreset === "Custom" && (
-                <div className="mt-2 space-y-2">
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded px-2 py-1"
-                    onChange={e => setCustomTime(ct => ({ ...ct, start: e.target.value ? new Date(e.target.value).toISOString() : undefined }))}
-                  />
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded px-2 py-1"
-                    onChange={e => setCustomTime(ct => ({ ...ct, end: e.target.value ? new Date(e.target.value).toISOString() : undefined }))}
-                  />
+                <div className="mt-3 space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full border border-slate-300 rounded-md px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                      onChange={e => setCustomTime(ct => ({ ...ct, start: e.target.value ? new Date(e.target.value).toISOString() : undefined }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">End Date</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full border border-slate-300 rounded-md px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                      onChange={e => setCustomTime(ct => ({ ...ct, end: e.target.value ? new Date(e.target.value).toISOString() : undefined }))}
+                    />
+                  </div>
                 </div>
               )}
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-2">Layers</div>
-              <label className="flex items-center gap-2 mb-2">
-                <input type="checkbox" checked={showPins} onChange={e => setShowPins(e.target.checked)} /> <span>Pin Clusters</span>
+              <div className="text-sm font-semibold text-slate-700 mb-3">Layers</div>
+              <label className="flex items-center gap-3 mb-3 cursor-pointer">
+                <input type="checkbox" checked={showPins} onChange={e => setShowPins(e.target.checked)} className="w-4 h-4 text-sky-600 border-slate-300 rounded focus:ring-sky-500" /> 
+                <span className="text-slate-800 font-medium">Pin Clusters</span>
               </label>
-              <label className="flex items-center gap-2 mb-2">
-                <input type="checkbox" checked={showHeat} onChange={e => setShowHeat(e.target.checked)} /> <span>Hotspot Heatmap</span>
+              <label className="flex items-center gap-3 mb-3 cursor-pointer">
+                <input type="checkbox" checked={showHeat} onChange={e => setShowHeat(e.target.checked)} className="w-4 h-4 text-sky-600 border-slate-300 rounded focus:ring-sky-500" /> 
+                <span className="text-slate-800 font-medium">Hotspot Heatmap</span>
               </label>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" checked={showRanges} onChange={e => setShowRanges(e.target.checked)} /> <span>Issue Range Rings</span>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={showRanges} onChange={e => setShowRanges(e.target.checked)} className="w-4 h-4 text-sky-600 border-slate-300 rounded focus:ring-sky-500" /> 
+                <span className="text-slate-800 font-medium">Issue Range Rings</span>
               </label>
             </div>
           </div>
@@ -600,32 +620,32 @@ export default function HazardDashboard() {
           </div>
 
           {/* Bottom timeline on mobile */}
-          <div className="md:hidden absolute bottom-2 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-3 py-2 rounded shadow flex items-center gap-2 z-10">
-            <button className="px-2 py-1 bg-slate-200 rounded" onClick={() => setPlaying(p => !p)}>{playing ? "Pause" : "Play"}</button>
-            <input type="range" min="0" max="100" value={timeline} onChange={e => setTimeline(Number(e.target.value))} />
+          <div className="md:hidden absolute bottom-2 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 z-10 border border-slate-200">
+            <button className="px-3 py-1 bg-slate-200 text-slate-800 rounded font-medium hover:bg-slate-300 transition-colors" onClick={() => setPlaying(p => !p)}>{playing ? "Pause" : "Play"}</button>
+            <input type="range" min="0" max="100" value={timeline} onChange={e => setTimeline(Number(e.target.value))} className="flex-1" />
           </div>
         </main>
 
         {/* Right panel (off-canvas on mobile) */}
         <aside className={`bg-white border-l overflow-y-auto p-4 ${rightOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative md:h-full`}>
-          <div className="md:hidden flex justify-between items-center mb-3">
-            <div className="font-semibold">Validation Queue</div>
-            <button onClick={() => setRightOpen(false)} className="px-2 py-1 bg-slate-200 rounded">Close</button>
+          <div className="md:hidden flex justify-between items-center mb-4">
+            <div className="font-semibold text-slate-180 text-lg">Validation Queue</div>
+            <button onClick={() => setRightOpen(false)} className="px-3 py-1 bg-slate-200 text-slate-180 rounded hover:bg-slate-300 transition-colors font-medium">Close</button>
           </div>
 
-          <h3 className="font-semibold mb-3 hidden md:block">Validation Queue</h3>
+          <h3 className="font-semibold mb-4 hidden md:block text-slate-800 text-lg">Validation Queue</h3>
           {pending.map(q => (
             <div
               key={q.id}
-              className="border rounded p-3 mb-3 hover:bg-slate-50 cursor-pointer"
+              className="border border-slate-200 rounded-lg p-4 mb-3 hover:bg-slate-50 cursor-pointer transition-colors shadow-sm"
               onClick={() => openReport(q)}
             >
-              <div className="font-semibold text-red-600">{q.severity}</div>
-              <div className="text-sm">{q.type} • {new Date(q.createdAt).toLocaleString()}</div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <button onClick={(e) => verify(q.id, e)} className="px-2 py-1 bg-green-600 text-white rounded text-xs">Verify</button>
-                <button onClick={(e) => flag(q.id, e)} className="px-2 py-1 bg-red-600 text-white rounded text-xs">Flag</button>
-                <button onClick={(e) => dismiss(q.id, e)} className="px-2 py-1 bg-slate-200 text-white rounded text-xs">Dismiss</button>
+              <div className="font-semibold text-red-600 text-base mb-1">{q.severity}</div>
+              <div className="text-sm text-slate-700 mb-2">{q.type} • {new Date(q.createdAt).toLocaleString()}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button onClick={(e) => verify(q.id, e)} className="px-3 py-1 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors">Verify</button>
+                <button onClick={(e) => flag(q.id, e)} className="px-3 py-1 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors">Flag</button>
+                <button onClick={(e) => dismiss(q.id, e)} className="px-3 py-1 bg-slate-600 text-white rounded text-sm font-medium hover:bg-slate-700 transition-colors">Dismiss</button>
               </div>
             </div>
           ))}
