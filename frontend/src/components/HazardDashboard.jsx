@@ -530,7 +530,7 @@ export default function HazardDashboard() {
               <div className="text-xs font-semibold text-slate-500 mb-2">Time Range</div>
               <div className="flex flex-wrap gap-2">
                 {TIME_PRESETS.map(p => (
-                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-black" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
+                  <button key={p} className={`px-3 py-1 rounded ${timePreset === p ? "bg-sky-600 text-blac" : "bg-slate-200"}`} onClick={() => setTimePreset(p)}>{p}</button>
                 ))}
               </div>
               {timePreset === "Custom" && (

@@ -1,6 +1,7 @@
 const express = require("express");
 // const Report = require("../models/report");
 const rateLimit = require("express-rate-limit");
+const { uploadFiles } = require("../middleware/upload");
 
 const router = express.Router();
 const validateReport = require("../controllers/user.controller")
@@ -12,7 +13,7 @@ const reportLimiter = rateLimit({
 });
 
 
-router.post("/submit/report",reportLimiter,validateReport);
+router.post("/submit/report", reportLimiter, uploadFiles, validateReport);
 
 // router.get('/')
 

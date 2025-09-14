@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'hazard_report_model.dart';
+import 'services/api_service.dart';
 
 class HazardReportPage extends StatefulWidget {
   const HazardReportPage({super.key});
@@ -21,6 +22,9 @@ class _HazardReportPageState extends State<HazardReportPage> {
   String? currentLocation;
   XFile? mediaFile;
   bool isRecording = false;
+  bool isSubmitting = false;
+  
+  final ApiService _apiService = ApiService();
 
   @override
   void dispose() {
@@ -108,6 +112,80 @@ class _HazardReportPageState extends State<HazardReportPage> {
         backgroundColor: Colors.redAccent,
       ),
     );
+  }
+
+  Future<void> _submitReport() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Check if location is available
+    if (currentLocation == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please detect your location before submitting the report."),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      isSubmitting = true;
+    });
+
+    try {
+      final report = HazardReport(
+        hazardType: selectedHazard,
+        description: descriptionController.text,
+        location: currentLocation,
+        mediaFile: mediaFile,
+      );
+
+      final result = await _apiService.submitHazardReport(
+        report: report,
+        // Add auth token here if you have authentication implemented
+        // authToken: 'your_auth_token_here',
+      );
+
+      if (!mounted) return;
+
+      if (result['success']) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to success page
+        context.go('/success', extra: report);
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to submit report: ${e.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -267,19 +345,24 @@ class _HazardReportPageState extends State<HazardReportPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Form is valid, proceed with submission
-                      final report = HazardReport(
-                        hazardType: selectedHazard,
-                        description: descriptionController.text,
-                        location: currentLocation,
-                        mediaFile: mediaFile,
-                      );
-                      context.go('/success', extra: report);
-                    }
-                  },
-                  child: const Text("SUBMIT REPORT"),
+                  onPressed: isSubmitting ? null : _submitReport,
+                  child: isSubmitting
+                      ? const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text("SUBMITTING..."),
+                          ],
+                        )
+                      : const Text("SUBMIT REPORT"),
                 ),
               ),
             ],
