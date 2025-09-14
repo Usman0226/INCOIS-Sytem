@@ -486,7 +486,7 @@ export default function HazardDashboard() {
         style={{ height: "calc(var(--app-vh, 100dvh) - 48px)" }}
       >
         {/* Left sidebar (off-canvas on mobile) */}
-        <aside className={`bg-white border-r overflow-y-auto p-4 ${leftOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative md:h-full`}>
+       <aside className={`bg-white border-r overflow-y-auto p-4 ${leftOpen ? "fixed inset-0 z-40" : "hidden"} md:block md:relative md:h-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
           {/* Mobile close */}
           <div className="md:hidden flex justify-between items-center mb-3">
             <div className="font-semibold">Filters</div>
@@ -623,9 +623,7 @@ export default function HazardDashboard() {
               <div className="font-semibold text-red-600">{q.severity}</div>
               <div className="text-sm">{q.type} • {new Date(q.createdAt).toLocaleString()}</div>
               <div className="mt-2 flex flex-wrap gap-2">
-                 {/* MODIFIED: Changed text-black to text-white for better contrast */}
                 <button onClick={(e) => verify(q.id, e)} className="px-2 py-1 bg-green-600 text-white rounded text-xs">Verify</button>
-                {/* MODIFIED: Changed color to red and text to white for clarity and contrast */}
                 <button onClick={(e) => flag(q.id, e)} className="px-2 py-1 bg-red-600 text-white rounded text-xs">Flag</button>
                 <button onClick={(e) => dismiss(q.id, e)} className="px-2 py-1 bg-slate-200 text-white rounded text-xs">Dismiss</button>
               </div>

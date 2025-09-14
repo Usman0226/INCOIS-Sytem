@@ -47,7 +47,7 @@ export default function Login({ onLogin }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
       <div className="w-full max-w-md bg-white rounded shadow-md p-6">
-        <h1 className="text-xl font-semibold mb-4 text-center">Login</h1>
+        <h1 className="text-xl text-slate-800 font-semibold mb-4 text-center">Login</h1>
 
         {error && (
           <div className="bg-red-100 text-red-700 px-3 py-2 mb-3 rounded">
@@ -57,24 +57,24 @@ export default function Login({ onLogin }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-slate-700 text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full text-[#1b1b1b] border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
               placeholder="Enter your GOVT email"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-slate-700 text-sm font-medium mb-1">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full text-[#1b1b1b] border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
               placeholder="••••••••"
               required
             />
@@ -93,7 +93,7 @@ export default function Login({ onLogin }) {
           Demo: use <code>scientist.incois@gov.in</code> /{" "}
           <code>Pass@1234</code>
         </p>
-        <p className="mt-4 text-center text-sm ">
+        <p className="mt-4  text-center text-sm ">
           Don’t have an account?{" "}
           <Link
             to="/signup"
