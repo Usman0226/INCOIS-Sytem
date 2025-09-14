@@ -38,6 +38,8 @@ const register = async (req, res) => {
       phone,
     });
 
+    console.log(user)
+
     res.status(201).json({
       message: "User created & OTP sent",
       phone: user.phone,

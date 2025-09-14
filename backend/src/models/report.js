@@ -6,12 +6,12 @@ const reportSchema = new mongoose.Schema({
     required: true
   },
   image_url: {
-    type: String,
-    default: null
+    type: [String],
+    default: []
   },
   video_url: {
-    type: String,
-    default: null
+    type: [String],
+    default: []
   },
   lat : String,
   lon : String,
