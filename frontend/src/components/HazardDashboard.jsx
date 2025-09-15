@@ -24,7 +24,7 @@ const HAZ_TYPES = [
   "Marine weather",
   "Coastal erosion",
 ];
-const STATUSES = ["verified", "unverified", "flagged", "dismissed"];
+const STATUSES = ["Verified", "UnVerified", "Flagged", "Dismissed"];
 const ZONES = ["Administrative", "Oceanographic", "Population-based"];
 const TIME_PRESETS = ["24h", "7d", "Seasonal", "Custom"];
 
@@ -36,7 +36,7 @@ const sampleHazards = [
     lng: 80.27,
     severity: "Critical",
     type: "Tsunami waves",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: hoursAgo(2),
     zone: "Administrative",
     userReport: {
@@ -75,7 +75,7 @@ const sampleHazards = [
     lng: 76.96,
     severity: "High",
     type: "Storm surge",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: hoursAgo(1),
     zone: "Oceanographic",
     userReport: {
@@ -99,7 +99,7 @@ const sampleHazards = [
     lng: 72.88,
     severity: "Moderate",
     type: "High wave conditions",
-    status: "flagged",
+    status: "Flagged",
     createdAt: hoursAgo(6),
     zone: "Population-based",
   },
@@ -109,7 +109,7 @@ const sampleHazards = [
     lng: 79.88,
     severity: "Low",
     type: "Coastal erosion",
-    status: "verified",
+    status: "Verified",
     createdAt: hoursAgo(12),
     validatedAt: hoursAgo(11.5),
     validatedBy: "scientist@incois",
@@ -121,7 +121,7 @@ const sampleHazards = [
     lng: 80.23,
     severity: "High",
     type: "Marine weather",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: minutesAgo(30),
     zone: "Oceanographic",
     userReport: {
@@ -145,7 +145,7 @@ const sampleHazards = [
     lng: 83.23,
     severity: "High",
     type: "Storm surge",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: minutesAgo(20),
     zone: "Oceanographic",
   },
@@ -155,7 +155,7 @@ const sampleHazards = [
     lng: 76.28,
     severity: "Moderate",
     type: "Marine weather",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: minutesAgo(55),
     zone: "Administrative",
   },
@@ -165,7 +165,7 @@ const sampleHazards = [
     lng: 73.82,
     severity: "Critical",
     type: "Tsunami waves",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: hoursAgo(3),
     zone: "Population-based",
     radiusMeters: 60000,
@@ -190,7 +190,7 @@ const sampleHazards = [
     lng: 82.24,
     severity: "High",
     type: "High wave conditions",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: hoursAgo(4),
     zone: "Oceanographic",
   },
@@ -200,7 +200,7 @@ const sampleHazards = [
     lng: 86.61,
     severity: "Low",
     type: "Coastal erosion",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: hoursAgo(5),
     zone: "Administrative",
     radiusMeters: 9000,
@@ -211,7 +211,7 @@ const sampleHazards = [
     lng: 87.51,
     severity: "Moderate",
     type: "Marine weather",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: minutesAgo(75),
     zone: "Population-based",
   },
@@ -221,7 +221,7 @@ const sampleHazards = [
     lng: 74.85,
     severity: "High",
     type: "Storm surge",
-    status: "unverified",
+    status: "UnVerified",
     createdAt: minutesAgo(42),
     zone: "Oceanographic",
   },
@@ -237,10 +237,10 @@ const createCircleIcon = (color, size = 30) =>
   });
 
 const statusColors = {
-  verified: "text-green-600",
-  unverified: "text-orange-600",
-  flagged: "text-red-600",
-  dismissed: "text-slate-500",
+  Verified: "text-green-600",
+  UnVerified: "text-orange-600",
+  Flagged: "text-red-600",
+  Dismissed: "text-slate-500",
 };
 
 // Severity → default range (meters)
@@ -619,10 +619,10 @@ export default function HazardDashboard({ scientist, onLogout }) {
   const iconFor = (status) => {
     const size = isMobile ? 36 : 30;
     const colors = {
-      verified: "#22c55e",
-      unverified: "#f97316",
-      flagged: "#ef4444",
-      dismissed: "#94a3b8",
+      Verified: "#22c55e",
+      UnVerified: "#f97316",
+      Flagged: "#ef4444",
+      Dismissed: "#94a3b8",
     };
     return createCircleIcon(colors[status], size);
   };
@@ -674,7 +674,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtered]);
 
-  const pending = hazards.filter((h) => h.status === "unverified");
+  const pending = hazards.filter((h) => h.status === "UnVerified");
 
   const verify = (id, e) => {
     if (e) e.stopPropagation();
@@ -683,7 +683,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
         h.id === id
           ? {
               ...h,
-              status: "verified",
+              status: "Verified",
               validatedAt: now(),
               validatedBy: "scientist@incois",
             }
@@ -698,7 +698,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
         h.id === id
           ? {
               ...h,
-              status: "flagged",
+              status: "Flagged",
               validatedAt: now(),
               validatedBy: "scientist@incois",
             }
@@ -713,7 +713,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
         h.id === id
           ? {
               ...h,
-              status: "dismissed",
+              status: "Dismissed",
               validatedAt: now(),
               validatedBy: "scientist@incois",
             }
@@ -783,7 +783,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
               </span>
               <button
                 onClick={onLogout}
-                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium transition-colors shadow-sm"
+                className="px-3 py-1 bg-red-600 text-black rounded hover:bg-red-700 text-sm font-medium transition-colors shadow-sm"
               >
                 Logout
               </button>
@@ -921,7 +921,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
                     key={p}
                     className={`px-3 py-2 rounded font-medium transition-colors ${
                       timePreset === p
-                        ? "bg-sky-600 text-white shadow-md"
+                        ? "bg-sky-600 text-black shadow-md"
                         : "bg-slate-200 text-slate-180 hover:bg-slate-300"
                     }`}
                     onClick={() => setTimePreset(p)}
@@ -1093,7 +1093,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
           {pending.map((q) => (
             <div
               key={q.id}
-              className="border border-slate-200 rounded-lg p-4 mb-3 hover:bg-slate-50 cursor-pointer transition-colors shadow-sm"
+              className="border border-black rounded-lg p-4 mb-3 hover:bg-slate-50 cursor-pointer transition-colors shadow-sm"
               onClick={() => openReport(q)}
             >
               <div className="font-semibold text-red-600 text-base mb-1">
@@ -1105,19 +1105,19 @@ export default function HazardDashboard({ scientist, onLogout }) {
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   onClick={(e) => verify(q.id, e)}
-                  className="px-3 py-1 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
+                  className="px-3 py-1 bg-green-600 text-black rounded text-sm font-medium hover:bg-green-700 transition-colors"
                 >
                   Verify
                 </button>
                 <button
                   onClick={(e) => flag(q.id, e)}
-                  className="px-3 py-1 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors"
+                  className="px-3 py-1 bg-red-600 text-black rounded text-sm font-medium hover:bg-red-700 transition-colors"
                 >
                   Flag
                 </button>
                 <button
                   onClick={(e) => dismiss(q.id, e)}
-                  className="px-3 py-1 bg-slate-600 text-white rounded text-sm font-medium hover:bg-slate-700 transition-colors"
+                  className="px-3 py-1 bg-slate-600 text-black rounded text-sm font-medium hover:bg-slate-700 transition-colors"
                 >
                   Dismiss
                 </button>
