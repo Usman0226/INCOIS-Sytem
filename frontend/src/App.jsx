@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Login from "./components/Login";
-import SignUp from "./components/SignUp";
+import SignUp from "./components/SignUp.jsx";
+import Login from "./components/login.jsx"
 import HazardDashboard from "./components/HazardDashboard";
 
 function App() {
