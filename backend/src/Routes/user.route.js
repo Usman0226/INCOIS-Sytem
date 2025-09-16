@@ -13,7 +13,9 @@ const reportLimiter = rateLimit({
 });
 
 
-router.post("/submit/report", reportLimiter, uploadFiles, validateReport);
+router.post("/submit/report", reportLimiter, uploadFiles, validateReport,(req,res)=>{
+  res.status(201).json({message : "Report submit completed !"})
+});
 
 // router.get('/')
 

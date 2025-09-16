@@ -80,7 +80,7 @@ class ApiService {
         }
       }
 
-      // Make the API call
+      // API call
       final response = await _dio.post(
         '/user/submit/report',
         data: formData,

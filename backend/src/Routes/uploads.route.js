@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const uploadsDir = path.join(__dirname, '../uploads'); // adjust to match your structure
+const uploadsDir = path.join(__dirname, '../uploads'); 
 
 app.get('/api/uploads', (req, res) => {
   fs.readdir(uploadsDir, (err, files) => {
