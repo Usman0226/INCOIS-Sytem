@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -23,6 +25,21 @@ app.use('/uploads', express.static('../uploads'));
 app.use('/api/auth', authRoutes);
 app.use('/user',authenticateToken,userRoutes)
 app.use('/auth',authoritiesRoutes)
+
+
+
+const uploadsDir = path.join(__dirname, '../uploads');
+
+app.get('/api/uploads', (req, res) => {
+  fs.readdir(uploadsDir, (err, files) => {
+    console.log("at the uploads directory : ")
+    if (err) {
+      return res.status(500).json({ error: 'Unable to read uploads folder in the directory !' });
+    }
+    res.json({ files });
+  });
+});
+
 
 
 
