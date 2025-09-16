@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import '../hazard_report_model.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:3000';
+  // static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://incois-system.onrender.com';
   late Dio _dio;
 
   ApiService() {

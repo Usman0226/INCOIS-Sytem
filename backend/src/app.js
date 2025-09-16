@@ -16,8 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files statically
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded files statically to appear on render
+app.use('/uploads', express.static('../uploads'));
 
 // Routes
 app.use('/api/auth', authRoutes);
