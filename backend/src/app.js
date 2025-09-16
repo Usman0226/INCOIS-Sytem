@@ -23,7 +23,8 @@ app.use('/uploads', express.static('../uploads'));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/user',authenticateToken,userRoutes)
+// app.use('/user',authenticateToken,userRoutes)
+app.use('/user',userRoutes)
 app.use('/auth',authoritiesRoutes)
 
 
@@ -36,6 +37,7 @@ app.get('/api/uploads', (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Unable to read uploads folder in the directory !' });
     }
+    console.log("Files are uploaded and cross checked with the backend !")
     res.json({ files });
   });
 });

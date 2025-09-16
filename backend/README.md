@@ -127,4 +127,6 @@ Content-Type: application/json
 - Use strong JWT secrets in production
 - Implement rate limiting for OTP requests
 
-## 
+## API
+
+- https://incois-system.onrender.com/api/uploads
