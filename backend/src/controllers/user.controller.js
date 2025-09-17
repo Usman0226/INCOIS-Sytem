@@ -2,7 +2,7 @@ const Report = require("../models/report");
 
 const validateReport = async (req, res) => {
   try {
-    const { text, lat, lon } = req.body;
+    const { hazardType , text, lat, lon } = req.body;
     const files = req.files;
 
     const parsedLat = parseFloat(lat);
@@ -62,6 +62,7 @@ const validateReport = async (req, res) => {
       console.log(" Push to already existing cluster:", savedReport._id);
     } else {
       const reportData = {
+        hazardType,
         text,
         image_url: image_urls,
         video_url: video_urls,

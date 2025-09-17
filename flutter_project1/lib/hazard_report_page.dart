@@ -150,6 +150,9 @@ class _HazardReportPageState extends State<HazardReportPage> {
 
       if (!mounted) return;
 
+      // Debug: Print the result to see what's actually happening
+      print('Submit result: $result');
+
       if (result['success']) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(

@@ -13,9 +13,7 @@ class ApiService {
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      // Remove default Content-Type to avoid conflicts with multipart
     ));
 
     // Add interceptor for logging in debug mode
@@ -69,14 +67,12 @@ class ApiService {
             'video',
             await MultipartFile.fromFile(file.path, filename: fileName),
           ));
-          formData.fields.add(MapEntry('video_url', fileName));
         } else {
           // Image file
           formData.files.add(MapEntry(
             'image',
             await MultipartFile.fromFile(file.path, filename: fileName),
           ));
-          formData.fields.add(MapEntry('image_url', fileName));
         }
       }
 
@@ -107,7 +103,13 @@ class ApiService {
       String errorMessage = 'Network error occurred';
       
       if (e.response != null) {
-        errorMessage = e.response!.data['message'] ?? 'Server error occurred';
+        if (e.response!.statusCode == 401) {
+          errorMessage = 'Authentication required. Please contact support.';
+        } else if (e.response!.statusCode == 403) {
+          errorMessage = 'Access denied. Please contact support.';
+        } else {
+          errorMessage = e.response!.data['message'] ?? 'Server error occurred';
+        }
       } else if (e.type == DioExceptionType.connectionTimeout) {
         errorMessage = 'Connection timeout. Please check your internet connection.';
       } else if (e.type == DioExceptionType.receiveTimeout) {

@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema({
+  hazardType :{
+    type : String,
+    required : true
+  },
   text: {
     type: String,
     required: true
