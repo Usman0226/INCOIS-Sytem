@@ -5,33 +5,43 @@ const validateReport = async (req, res) => {
     const { text, lat, lon } = req.body;
     const files = req.files;
 
-    // Extract uploaded file URLs
+    const parsedLat = parseFloat(lat);
+    const parsedLon = parseFloat(lon);
+
     let image_urls = [];
     let video_urls = [];
 
     if (files) {
       if (files.image) {
-        image_urls = files.image.map(file => file.filename);
+        image_urls = files.image.map((file) => file.filename);
       }
       if (files.video) {
-        video_urls = files.video.map(file => file.filename);
+        video_urls = files.video.map((file) => file.filename);
       }
     }
 
-    // Validation: require either text or media files
     if (!text && image_urls.length === 0 && video_urls.length === 0) {
-      return res.status(400).json({ message: "Either text or media files are required." });
+      return res
+        .status(400)
+        .json({ message: "Either text or media files are required." });
     }
 
-    // Validation: require location
-    if (!lat || !lon) {
-      return res.status(400).json({ message: "Location coordinates are required!" });
+    if (!lat || !lon || Number.isNaN(parsedLat) || Number.isNaN(parsedLon)) {
+      return res
+        .status(400)
+        .json({ message: "Location coordinates are required!" });
     }
 
-    const DUP_RADIUS = 0.001; 
+    const DUP_RADIUS = 0.001;
     const existingCluster = await Report.findOne({
-      lat: { $gte: (parseFloat(lat) - DUP_RADIUS).toString(), $lte: (parseFloat(lat) + DUP_RADIUS).toString() },
-      lon: { $gte: (parseFloat(lon) - DUP_RADIUS).toString(), $lte: (parseFloat(lon) + DUP_RADIUS).toString() },
+      lat: {
+        $gte: parsedLat - DUP_RADIUS,
+        $lte: parsedLat + DUP_RADIUS,
+      },
+      lon: {
+        $gte: parsedLon - DUP_RADIUS,
+        $lte: parsedLon + DUP_RADIUS,
+      },
     });
 
     let savedReport;
@@ -39,7 +49,7 @@ const validateReport = async (req, res) => {
       if (text) {
         existingCluster.text = existingCluster.text
           ? `${existingCluster.text} | ${text}`
-          : text; 
+          : text;
       }
       if (image_urls.length > 0) {
         existingCluster.image_url.push(...image_urls);
@@ -55,8 +65,8 @@ const validateReport = async (req, res) => {
         text,
         image_url: image_urls,
         video_url: video_urls,
-        lat,
-        lon,
+        lat: parsedLat,
+        lon: parsedLon,
       };
 
       savedReport = await Report.create(reportData);
@@ -75,10 +85,6 @@ const validateReport = async (req, res) => {
 
 module.exports = validateReport;
 
-
-
-
-
 // const Report = require("../models/report");
 // const axios = require("axios");
 
@@ -95,13 +101,13 @@ module.exports = validateReport;
 
 //     let reportData = { text, image_url, video_url, lat, lon };
 
-//     // Step 1: Cross-Modal Consistency
+//     //  Cross-Modal Consistency
 //     if (text && image_url) {
 //       const consistency = await axios.post(process.env.CONSISTENCY_API_URL, { text, image_url });
 //       reportData.consistency_score = consistency.data.score;
 //     }
 
-//     // Step 2: Satellite Imagery Verification
+//     // Satellite Imagery Verification
 //     if (isHighPriority(reportData)) {
 //       const satCheck = await checkSatelliteChange(lat, lon);
 //       reportData.satellite_change = satCheck;
@@ -132,4 +138,3 @@ module.exports = validateReport;
 // };
 
 // module.exports = validateReport;
-

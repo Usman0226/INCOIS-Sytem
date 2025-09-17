@@ -13,8 +13,8 @@ const reportSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  lat : String,
-  lon : String,
+  lat : Number,
+  lon : Number,
   // metadata: {
   //   user_id: { type: String, required: true },
   //   lat: { type: Number, required: true },

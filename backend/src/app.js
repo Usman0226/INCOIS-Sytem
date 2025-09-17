@@ -13,23 +13,21 @@ const authRoutes = require('./Routes/auth.route');
 const userRoutes = require('./Routes/user.route');
 const authoritiesRoutes = require('./Routes/authorities.route')
 const { authenticateToken } = require('./middleware/auth');
-
+ 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files statically to appear on render
-app.use('/uploads', express.static('../uploads'));
+// Serve uploaded files statically using absolute path
+const uploadsDir = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsDir));
 
 // Routes
 app.use('/api/auth', authRoutes);
 // app.use('/user',authenticateToken,userRoutes)
-app.use('/user',userRoutes)
+app.use('/user',authenticateToken,userRoutes)
 app.use('/auth',authoritiesRoutes)
-
-
-
-const uploadsDir = path.join(__dirname, '../uploads');
+// Uploads listing endpoint
 
 app.get('/api/uploads', (req, res) => {
   fs.readdir(uploadsDir, (err, files) => {

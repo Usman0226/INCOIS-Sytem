@@ -1,9 +1,11 @@
+const express = require('express');
 const fs = require('fs');
 const path = require('path');
 
-const uploadsDir = path.join(__dirname, '../uploads'); 
+const router = express.Router();
+const uploadsDir = path.join(__dirname, '../uploads');
 
-app.get('/api/uploads', (req, res) => {
+router.get('/api/uploads', (req, res) => {
   fs.readdir(uploadsDir, (err, files) => {
     if (err) {
       return res.status(500).json({ error: 'Unable to read uploads folder' });
@@ -12,4 +14,4 @@ app.get('/api/uploads', (req, res) => {
   });
 });
 
-
+module.exports = router;
