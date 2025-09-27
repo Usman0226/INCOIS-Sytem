@@ -28,6 +28,7 @@ const STATUSES = ["Verified", "UnVerified", "Flagged", "Dismissed"];
 const ZONES = ["Administrative", "Oceanographic", "Population-based"];
 const TIME_PRESETS = ["24h", "7d", "Seasonal", "Custom"];
 
+
 // Sample hazards (with userReport.attachments for text, image, audio, video)
 const sampleHazards = [
   {
@@ -262,8 +263,43 @@ function useViewportHeightVar() {
   }, []);
 }
 
-// Heatmap Overlay
-// MODIFIED: Increased default radius and blur for better visibility
+//   const [hazards, setHazards] = useState(sampleHazards);
+
+//   // useEffect to fetch reports from the API and append them to the existing list
+//   useEffect(() => {
+//     const fetchAndAppendHazards = async () => {
+//       try {
+//         const response = await fetch("http://localhost:3000/auth/get/reports");
+//         if (!response.ok) {
+//           throw new Error(`HTTP Error: ${response.status}`);
+//         }
+        
+//         const responseData = await response.json();
+        
+//         if (Array.isArray(responseData.data)) {
+//           // Normalize the fetched data: create 'lng' property from 'lon'
+//           const normalizedNewHazards = responseData.data.map(hazard => ({
+//             ...hazard,
+//             lng: hazard.lon,
+//           }));
+
+//           // Append the new, normalized hazards to the existing list
+//           setHazards(prevHazards => [...prevHazards, ...normalizedNewHazards]);
+          
+//           console.log("Fetched and appended new reports successfully.");
+//         } else {
+//           console.error("API did not return a data array:", responseData);
+//         }
+
+//       } catch (error) {
+//         console.error("Failed to fetch hazard reports:", error);
+//       }
+//     };
+
+//     fetchAndAppendHazards();
+//   }, []);
+
+
 function HeatmapOverlay({ points, radius = 40, blur = 25, maxZoom = 12 }) {
   const map = useMap();
   const layerRef = useRef(null);
@@ -676,26 +712,30 @@ export default function HazardDashboard({ scientist, onLogout }) {
 
   const pending = hazards.filter((h) => h.status === "UnVerified");
 
-  const verify = (id, e) => {
-    if (e) e.stopPropagation();
-    setHazards((prev) =>
-      prev.map((h) =>
-        h.id === id
-          ? {
-              ...h,
-              status: "Verified",
-              validatedAt: now(),
-              validatedBy: "scientist@incois",
-            }
-          : h
-      )
-    );
-  };
+const verify = async (id, e) => {
+  if (e) e.stopPropagation();
+  alert("At the verify ! ")
+  try {
+    const res = await fetch(`http://localhost:3000/api/reports/${id}/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ validatedBy: "scientist@incois" }),
+    });
+    const verified = await res.json();
+
+    setHazards((prev) => prev.filter((h) => h._id !== id));
+
+    console.log("Verified report saved:", verified);
+  } catch (err) {
+    console.error("Error verifying report", err);
+  }
+};
+
   const flag = (id, e) => {
     if (e) e.stopPropagation();
     setHazards((prev) =>
       prev.map((h) =>
-        h.id === id
+        h._id === id
           ? {
               ...h,
               status: "Flagged",
@@ -710,7 +750,7 @@ export default function HazardDashboard({ scientist, onLogout }) {
     if (e) e.stopPropagation();
     setHazards((prev) =>
       prev.map((h) =>
-        h.id === id
+        h._id === id
           ? {
               ...h,
               status: "Dismissed",

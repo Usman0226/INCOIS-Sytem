@@ -41,6 +41,7 @@ class ApiService {
       // Add text data
       if (report.hazardType != null) {
         formData.fields.add(MapEntry('text', '${report.hazardType}: ${report.description ?? ''}'));
+        formData.fields.add(MapEntry('hazardType', report.hazardType!));
       }
 
       // Add location data
@@ -128,95 +129,105 @@ class ApiService {
     }
   }
 
-  // Login method for authentication
-  Future<Map<String, dynamic>> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/api/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'token': response.data['token'],
-          'user': response.data['user'],
-        };
-      } else {
-        return {
-          'success': false,
-          'message': response.data['message'] ?? 'Login failed',
-        };
-      }
-    } on DioException catch (e) {
-      String errorMessage = 'Login failed';
-      
-      if (e.response != null) {
-        errorMessage = e.response!.data['message'] ?? 'Invalid credentials';
-      }
-
-      return {
-        'success': false,
-        'message': errorMessage,
-      };
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'An unexpected error occurred during login',
-      };
-    }
-  }
-
-  // Register method for new users
-  Future<Map<String, dynamic>> register({
-    required String email,
-    required String password,
+  // Phone/OTP Authentication
+  Future<Map<String, dynamic>> registerUser({
     required String name,
+    required String phone,
   }) async {
     try {
       final response = await _dio.post(
-        '/api/auth/register',
+        '/api/auth/user/register',
         data: {
-          'email': email,
-          'password': password,
           'name': name,
+          'phone': phone,
         },
       );
 
-      if (response.statusCode == 201) {
-        return {
-          'success': true,
-          'message': response.data['message'] ?? 'Registration successful',
-          'user': response.data['user'],
-        };
-      } else {
-        return {
-          'success': false,
-          'message': response.data['message'] ?? 'Registration failed',
-        };
-      }
-    } on DioException catch (e) {
-      String errorMessage = 'Registration failed';
-      
-      if (e.response != null) {
-        errorMessage = e.response!.data['message'] ?? 'Registration error';
-      }
-
       return {
-        'success': false,
-        'message': errorMessage,
+        'success': response.statusCode == 201 || response.statusCode == 200,
+        'message': response.data['message'] ?? 'Registration initiated',
+        'phone': response.data['phone'],
       };
-    } catch (e) {
+    } on DioException catch (e) {
       return {
         'success': false,
-        'message': 'An unexpected error occurred during registration',
+        'message': e.response?.data['message'] ?? 'Registration failed',
       };
     }
   }
+
+  Future<Map<String, dynamic>> resendOtp({
+    required String phone,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/api/auth/resend-otp',
+        data: {
+          'phone': phone,
+        },
+      );
+
+      return {
+        'success': response.statusCode == 200,
+        'message': response.data['message'] ?? 'OTP sent',
+      };
+    } on DioException catch (e) {
+      return {
+        'success': false,
+        'message': e.response?.data['message'] ?? 'Failed to send OTP',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/api/auth/verify-otp',
+        data: {
+          'phone': phone,
+          'otp': otp,
+        },
+      );
+
+      return {
+        'success': response.statusCode == 200,
+        'message': response.data['message'] ?? 'OTP verified',
+        'token': response.data['token'],
+        'user': response.data['user'],
+      };
+    } on DioException catch (e) {
+      return {
+        'success': false,
+        'message': e.response?.data['message'] ?? 'OTP verification failed',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> loginWithPhone({
+    required String phone,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/api/auth/user/login',
+        data: {
+          'phone': phone,
+        },
+      );
+
+      return {
+        'success': response.statusCode == 200,
+        'message': response.data['message'] ?? 'Login successful',
+      };
+    } on DioException catch (e) {
+      return {
+        'success': false,
+        'message': e.response?.data['message'] ?? 'Login failed',
+      };
+    }
+  }
+
+  // Deprecated: old email/password methods removed in favor of phone/OTP
 }
