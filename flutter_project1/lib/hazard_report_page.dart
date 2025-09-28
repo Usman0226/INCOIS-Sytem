@@ -1,3 +1,5 @@
+// lib/hazard_report_page.dart
+
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
@@ -7,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'hazard_report_model.dart';
 import 'services/api_service.dart';
+import 'services/auth_service.dart'; // Import the AuthService
 
 class HazardReportPage extends StatefulWidget {
   const HazardReportPage({super.key});
@@ -124,6 +127,22 @@ class _HazardReportPageState extends State<HazardReportPage> {
       );
       return;
     }
+
+    // *** THIS IS THE KEY FIX ***
+    // Get the saved authentication token
+    final String? authToken = AuthService.token;
+
+    if (authToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Authentication error. Please log in again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    // **************************
+
     setState(() => isSubmitting = true);
 
     try {
@@ -134,7 +153,11 @@ class _HazardReportPageState extends State<HazardReportPage> {
         mediaFiles: List<XFile>.from(mediaFiles),
       );
 
-      final result = await _apiService.submitHazardReport(report: report);
+      // Pass the token to the API service
+      final result = await _apiService.submitHazardReport(
+        report: report,
+        authToken: authToken,
+      );
 
       if (!mounted) return;
       if (result['success']) {
@@ -273,50 +296,52 @@ class _HazardReportPageState extends State<HazardReportPage> {
                               borderRadius: BorderRadius.circular(8.0),
                               child:
                                   mediaFiles[i].mimeType?.startsWith('image') ??
-                                      false
-                                  ? kIsWeb
-                                        ? FutureBuilder<Uint8List>(
-                                            future: mediaFiles[i].readAsBytes(),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                      ConnectionState.done &&
-                                                  snapshot.hasData) {
-                                                return Image.memory(
-                                                  snapshot.data!,
-                                                  height: 80,
-                                                  width: 80,
-                                                  fit: BoxFit.cover,
-                                                );
-                                              } else {
-                                                return const SizedBox(
-                                                  height: 80,
-                                                  width: 80,
-                                                  child: Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          )
-                                        : Image.file(
-                                            File(mediaFiles[i].path),
-                                            height: 80,
-                                            width: 80,
-                                            fit: BoxFit.cover,
-                                          )
-                                  : Container(
-                                      color: Colors.black12,
-                                      height: 80,
-                                      width: 80,
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.videocam,
-                                          size: 40,
-                                          color: Colors.blueGrey,
+                                          false
+                                      ? kIsWeb
+                                          ? FutureBuilder<Uint8List>(
+                                              future:
+                                                  mediaFiles[i].readAsBytes(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState.done &&
+                                                    snapshot.hasData) {
+                                                  return Image.memory(
+                                                    snapshot.data!,
+                                                    height: 80,
+                                                    width: 80,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                } else {
+                                                  return const SizedBox(
+                                                    height: 80,
+                                                    width: 80,
+                                                    child: Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            )
+                                          : Image.file(
+                                              File(mediaFiles[i].path),
+                                              height: 80,
+                                              width: 80,
+                                              fit: BoxFit.cover,
+                                            )
+                                      : Container(
+                                          color: Colors.black12,
+                                          height: 80,
+                                          width: 80,
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.videocam,
+                                              size: 40,
+                                              color: Colors.blueGrey,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
                             ),
                             GestureDetector(
                               onTap: () => _removeMedia(i),
@@ -338,7 +363,6 @@ class _HazardReportPageState extends State<HazardReportPage> {
                     ],
                   ),
                 ),
-
               const SizedBox(height: 24),
               Center(
                 child: Column(

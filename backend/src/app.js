@@ -9,7 +9,6 @@ const app = express();
 
 //Routes  
 const authRoutes = require('./Routes/auth.route');
-
 const userRoutes = require('./Routes/user.route');
 const authoritiesRoutes = require('./Routes/authorities.route')
 const { authenticateToken } = require('./middleware/auth');

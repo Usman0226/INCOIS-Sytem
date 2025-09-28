@@ -9,7 +9,7 @@ const validateReport = require("../controllers/user.controller")
 const reportLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, 
   max: 5,
-  message: { error: "Too many reports from this user, try later !." }
+  message: { error: "Too many reports from this citizen , try later !." }
 });
 
 
@@ -19,7 +19,5 @@ const reportLimiter = rateLimit({
 // });
 
 router.post("/submit/report", reportLimiter, uploadFiles, validateReport);
-
-// router.get('/')
 
 module.exports = router;

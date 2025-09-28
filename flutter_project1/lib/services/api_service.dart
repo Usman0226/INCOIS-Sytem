@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiService {
+  // static const String baseUrl = 'http://localhost:3000';
   static const String baseUrl = 'https://incois-system.onrender.com';
   late Dio _dio;
 
@@ -158,7 +159,9 @@ Future<Map<String, dynamic>> submitHazardReport({
     try {
       final response = await _dio.post(
         '/api/auth/verify-otp',
-        data: {'phone': phone, 'otp': otp},
+        // *** THIS IS THE FIX ***
+        // Send the OTP as an integer so it matches your backend check
+        data: {'phone': phone, 'otp': int.parse(otp)},
       );
       return {
         'success': response.statusCode == 200,

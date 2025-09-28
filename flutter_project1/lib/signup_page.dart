@@ -1,16 +1,9 @@
+// lib/signup_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-/// Replace these with actual backend REST calls in production.
-Future<bool> sendOtp(String mobile) async {
-  await Future.delayed(const Duration(seconds: 1));
-  return true;
-}
-
-Future<bool> verifyAndRegister(String username, String mobile, String otp) async {
-  await Future.delayed(const Duration(seconds: 1));
-  return otp == "1234" && username.isNotEmpty;
-}
+import 'services/api_service.dart';
+import 'services/auth_service.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -23,8 +16,10 @@ class _SignUpPageState extends State<SignUpPage> {
   final _usernameController = TextEditingController();
   final _mobileController = TextEditingController();
   final _otpController = TextEditingController();
+  final ApiService _apiService = ApiService(); // Use the real API service
 
   bool _otpSent = false;
+  bool _isLoading = false; // Added for loading state
   String _errorMsg = "";
 
   @override
@@ -44,24 +39,35 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() => _errorMsg = "Username required");
       return;
     }
-    if (mobile.isEmpty || mobile.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(mobile)) {
+    if (mobile.isEmpty ||
+        mobile.length != 10 ||
+        !RegExp(r'^[0-9]+$').hasMatch(mobile)) {
       setState(() => _errorMsg = "Enter a valid 10-digit mobile number");
       return;
     }
-    final success = await sendOtp(mobile);
+
     setState(() {
-      if (success) {
+      _isLoading = true;
+      _errorMsg = "";
+    });
+
+    // Use the real ApiService to register
+    final result =
+        await _apiService.registerUser(name: username, phone: mobile);
+
+    setState(() {
+      _isLoading = false;
+      if (result['success']) {
         _otpSent = true;
-        _errorMsg = "OTP sent to $mobile";
+        _errorMsg = result['message'] ?? "OTP sent to $mobile";
       } else {
-        _errorMsg = "Failed to send OTP";
+        _errorMsg = result['message'] ?? "Failed to send OTP";
       }
     });
   }
 
   Future<void> _signUp() async {
     FocusScope.of(context).unfocus();
-    final username = _usernameController.text.trim();
     final mobile = _mobileController.text.trim();
     final otp = _otpController.text.trim();
 
@@ -69,12 +75,27 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() => _errorMsg = "Enter a valid OTP");
       return;
     }
-    final valid = await verifyAndRegister(username, mobile, otp);
-    if (valid) {
+
+    setState(() {
+      _isLoading = true;
+      _errorMsg = "";
+    });
+
+    // Use the real ApiService to verify
+    final result = await _apiService.verifyOtp(phone: mobile, otp: otp);
+
+    setState(() => _isLoading = false);
+
+    if (result['success']) {
+      // Store the token and user info
+      AuthService.setCredentials(
+        result['token'],
+        result['user'] as Map<String, dynamic>?,
+      );
       if (!mounted) return;
       context.go('/dashboard');
     } else {
-      setState(() => _errorMsg = "Invalid OTP or username");
+      setState(() => _errorMsg = result['message'] ?? "Invalid OTP or username");
     }
   }
 
@@ -103,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 TextField(
                   controller: _usernameController,
                   decoration: const InputDecoration(labelText: "Username"),
-                  enabled: !_otpSent,
+                  enabled: !_otpSent && !_isLoading,
                   onSubmitted: (_) {
                     if (!_otpSent) _sendOtp();
                   },
@@ -112,7 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 TextField(
                   controller: _mobileController,
                   decoration: const InputDecoration(labelText: "Mobile Number"),
-                  enabled: !_otpSent,
+                  enabled: !_otpSent && !_isLoading,
                   keyboardType: TextInputType.phone,
                   maxLength: 10,
                   onSubmitted: (_) {
@@ -126,19 +147,34 @@ class _SignUpPageState extends State<SignUpPage> {
                     decoration: const InputDecoration(labelText: "OTP"),
                     keyboardType: TextInputType.number,
                     maxLength: 6,
+                    enabled: !_isLoading,
                     onSubmitted: (_) => _signUp(),
                   ),
                 if (_errorMsg.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(_errorMsg,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                            color: _errorMsg.contains("sent")
+                                ? Colors.green
+                                : Colors.red),
                         textAlign: TextAlign.center),
                   ),
                 const SizedBox(height: 32),
                 ElevatedButton(
-                  child: Text(_otpSent ? "Sign Up" : "Send OTP"),
-                  onPressed: _otpSent ? _signUp : _sendOtp,
+                  onPressed: _isLoading
+                      ? null
+                      : (_otpSent ? _signUp : _sendOtp),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(_otpSent ? "Sign Up & Verify" : "Send OTP"),
                 ),
               ],
             ),

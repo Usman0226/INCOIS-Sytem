@@ -18,9 +18,10 @@ const register = async (req, res) => {
 
     if (user) {
       const otp = generateOTP();
+      console.log(otp);
       const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-      user.otp = otp;
+      user.otp = parseInt(otp);
       user.otpExpires = otpExpires;
       await user.save();
 
@@ -33,12 +34,16 @@ const register = async (req, res) => {
 
     // Create new user
     const otp = generateOTP();
+    console.log(otp);
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); 
     user = await User.create({
       name,
       phone,
+      otp: parseInt(otp),
+      otpExpires: otpExpires,
     });
 
-    console.log(user)
+    console.log(user);
 
     res.status(201).json({
       message: "User created & OTP sent",
@@ -62,18 +67,19 @@ const verifyOTP = async (req, res) => {
     }
 
     const user = await User.findOne({ phone });
+    console.log("user found : ", user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.otp !== otp) {
+    if (parseInt(user.otp) !== parseInt(otp)) {
       return res.status(401).json({ message: "Invalid OTP" });
     }
 
-    if (user.otpExpires < new Date()) {
-      return res.status(401).json({ message: "OTP has expired" });
-    }
+    // if (user.otpExpires < new Date()) {
+    //   return res.status(401).json({ message: "OTP has expired" });
+    // }
 
     user.isVerified = true;
     user.otp = null;
@@ -86,7 +92,7 @@ const verifyOTP = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.cookies("token", token);
+    res.cookie("token", token);
 
     res.status(200).json({
       message: "OTP Verified successfully",
@@ -119,6 +125,7 @@ const resendOTP = async (req, res) => {
     }
 
     const otp = generateOTP();
+    console.log(otp);
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     user.otp = otp;
@@ -168,26 +175,24 @@ const registerScientist = async (req, res) => {
     });
 
     const token = jwt.sign(
-      {id : scientist.id},
-      process.env.JWT_SECRET||"itisasecretkey",
-      {expiresIn : process.env.JWT_EXPIRES_IN || "7d"}
-    )
+      { id: scientist.id },
+      process.env.JWT_SECRET || "itisasecretkey",
+      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+    );
 
-    res.cookie('token',token,{
-      httpOnly : true,
-      secure : true,
-      maxAge : 15 * 24 * 3600 * 1000 
-    })
-    
-    res.status(200).json({message : "Scientist registration completed ! "})
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 15 * 24 * 3600 * 1000,
+    });
 
-
+    res.status(200).json({ message: "Scientist registration completed ! " });
   } catch (error) {
-    console.log("at registering scientist " ,error)
+    console.log("at registering scientist ", error);
   }
 };
 
-const loginAuthority = async (req, res) => {  
+const loginAuthority = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -213,18 +218,16 @@ const loginAuthority = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    return res
-      .status(200)
-      .json({ 
-        message: "Email found, login successfull !",
-        token: token,
-        scientist: {
-          id: scientist._id,
-          name: scientist.name,
-          email: scientist.email,
-          organization: scientist.organization
-        }
-      });
+    return res.status(200).json({
+      message: "Email found, login successfull !",
+      token: token,
+      scientist: {
+        id: scientist._id,
+        name: scientist.name,
+        email: scientist.email,
+        organization: scientist.organization,
+      },
+    });
   } catch (err) {
     console.log(`In login auth : ${err}`);
     return res.status(500).json({ message: "Internal server error" });

@@ -1,12 +1,16 @@
+// lib/report_alert_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'services/auth_service.dart'; // Import the AuthService
 
 class ReportAlertPage extends StatelessWidget {
   const ReportAlertPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const String userName = "User"; // Set from profile or auth in production
+    // Get the user's name from the AuthService
+    final String userName = AuthService.userName ?? "User";
 
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +37,7 @@ class ReportAlertPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              "Welcome, $userName!",
+              "Welcome, $userName!", // Display the dynamic user name
               style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
