@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-// Import all your page files
 import 'login_page.dart';
 import 'signup_page.dart';
 import 'report_alert_page.dart';
@@ -9,41 +8,26 @@ import 'hazard_report_page.dart';
 import 'report_success_page.dart';
 import 'view_report_page.dart';
 
-// 1. Define the GoRouter configuration
+/// Routing configuration for the app
 final GoRouter _router = GoRouter(
   initialLocation: '/login',
   routes: <RouteBase>[
-    GoRoute(path: '/login', builder: (context, state) => LoginPage()),
-    GoRoute(path: '/signup', builder: (context, state) => SignUpPage()),
-    GoRoute(
-      path: '/dashboard',
-      builder: (context, state) => const ReportAlertPage(),
-    ),
-    GoRoute(
-      path: '/hazardReport',
-      builder: (context, state) => const HazardReportPage(),
-    ),
-    GoRoute(
-      path: '/success',
-      builder: (context, state) => const ReportSuccessPage(),
-    ),
-    GoRoute(
-      path: '/viewReport',
-      builder: (context, state) => const ViewReportPage(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(path: '/signup', builder: (context, state) => const SignUpPage()),
+    GoRoute(path: '/dashboard', builder: (context, state) => const ReportAlertPage()),
+    GoRoute(path: '/hazardReport', builder: (context, state) => const HazardReportPage()),
+    GoRoute(path: '/success', builder: (context, state) => const ReportSuccessPage()),
+    GoRoute(path: '/viewReport', builder: (context, state) => const ViewReportPage()),
   ],
 );
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 2. Use MaterialApp.router and pass the router configuration
     return MaterialApp.router(
       title: 'Hazard Reporting App',
       theme: ThemeData(
@@ -68,7 +52,7 @@ class MyApp extends StatelessWidget {
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Colors.lightBlue,
           foregroundColor: Colors.white,
           elevation: 2,
@@ -80,8 +64,10 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Button for use in pages, now with flexible callback.
 class SubmitReportButton extends StatelessWidget {
-  const SubmitReportButton({super.key});
+  final VoidCallback? onPressed;
+  const SubmitReportButton({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -90,12 +76,10 @@ class SubmitReportButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.lightBlueAccent,
-          padding: const EdgeInsets.symmetric(vertical: 22), // Bigger height
+          padding: const EdgeInsets.symmetric(vertical: 22),
           textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        onPressed: () {
-          // Submit logic
-        },
+        onPressed: onPressed,
         child: const Text("SUBMIT REPORT"),
       ),
     );

@@ -1,77 +1,73 @@
 import 'package:image_picker/image_picker.dart';
 
+/// Represents a user-submitted hazard report with multiple media support.
 class HazardReport {
   final String? hazardType;
   final String? description;
   final String? location;
-  final XFile? mediaFile;
+  final List<XFile>? mediaFiles;
 
+  /// Standard constructor
   HazardReport({
-    required this.hazardType,
-    required this.description,
-    required this.location,
-    this.mediaFile,
+    this.hazardType,
+    this.description,
+    this.location,
+    this.mediaFiles,
   });
 
-  // Convert to JSON for API submission
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    
-    // Combine hazard type and description for text field
-    String text = '';
-    if (hazardType != null) {
-      text = hazardType!;
-      if (description != null && description!.isNotEmpty) {
-        text += ': $description';
-      }
-    } else if (description != null && description!.isNotEmpty) {
-      text = description!;
+  /// Combine hazard type and description for a single text field
+  String get reportText {
+    if ((hazardType?.isNotEmpty ?? false) && (description?.isNotEmpty ?? false)) {
+      return '$hazardType: $description';
+    } else if (hazardType?.isNotEmpty ?? false) {
+      return hazardType!;
+    } else {
+      return description ?? '';
     }
-    
-    if (text.isNotEmpty) {
-      json['text'] = text;
-    }
-
-    // Parse location to lat/lon
-    if (location != null) {
-      final locationParts = location!.split(', ');
-      if (locationParts.length >= 2) {
-        final lat = locationParts[0].replaceAll('Lat: ', '');
-        final lon = locationParts[1].replaceAll('Lng: ', '');
-        json['lat'] = lat;
-        json['lon'] = lon;
-      }
-    }
-
-    // Handle media file URLs (will be set after upload)
-    json['image_url'] = [];
-    json['video_url'] = [];
-
-    return json;
   }
 
-  // Create from JSON
+  /// Converts the instance to a JSON object for backend/API.
+  Map<String, dynamic> toJson() {
+    double? lat, lon;
+    if (location != null) {
+      final parts = location!.split(', ');
+      if (parts.length == 2) {
+        lat = double.tryParse(parts[0].replaceAll('Lat: ', ''));
+        lon = double.tryParse(parts[1].replaceAll('Lng: ', ''));
+      }
+    }
+    return {
+      'text': reportText,
+      'lat': lat,
+      'lon': lon,
+      // List of local file paths; actual upload handled elsewhere
+      'media_files': mediaFiles?.map((f) => f.path).toList() ?? [],
+    };
+  }
+
+  /// Constructs a HazardReport from a JSON object.
   factory HazardReport.fromJson(Map<String, dynamic> json) {
     return HazardReport(
-      hazardType: json['hazardType'],
-      description: json['description'],
-      location: json['location'],
-      mediaFile: null, // XFile cannot be serialized from JSON
+      hazardType: json['hazardType'] as String?,
+      description: json['description'] as String?,
+      location: json['location'] as String?,
+      // mediaFiles cannot be reconstructed from backend JSON
+      mediaFiles: null,
     );
   }
 
-  // Copy with method for updating report
+  /// Easy copy for patching report fields.
   HazardReport copyWith({
     String? hazardType,
     String? description,
     String? location,
-    XFile? mediaFile,
+    List<XFile>? mediaFiles,
   }) {
     return HazardReport(
       hazardType: hazardType ?? this.hazardType,
       description: description ?? this.description,
       location: location ?? this.location,
-      mediaFile: mediaFile ?? this.mediaFile,
+      mediaFiles: mediaFiles ?? this.mediaFiles,
     );
   }
 }

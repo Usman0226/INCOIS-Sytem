@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'hazard_report_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ViewReportPage extends StatelessWidget {
   const ViewReportPage({super.key});
@@ -47,28 +50,69 @@ class ViewReportPage extends StatelessWidget {
             _buildDetailRow("Description:", report.description),
             _buildDetailRow("Location:", report.location),
             const SizedBox(height: 20),
-            if (report.mediaFile != null) ...[
+            if (report.mediaFiles != null && report.mediaFiles!.isNotEmpty) ...[
               Text(
                 "Attached Media:",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 10),
-              Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    File(report.mediaFile!.path),
-                    fit: BoxFit.cover,
-                    height: 250,
-                    width: double.infinity,
-                  ),
-                ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  for (final file in report.mediaFiles!)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: buildMediaPreview(file),
+                    ),
+                ],
               ),
             ],
           ],
         ),
       ),
     );
+  }
+
+  Widget buildMediaPreview(XFile file) {
+    if (file.mimeType?.startsWith('image') ?? false) {
+      if (kIsWeb) {
+        return FutureBuilder<Uint8List>(
+          future: file.readAsBytes(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+              return Image.memory(
+                snapshot.data!,
+                fit: BoxFit.cover,
+                height: 250,
+                width: 250,
+              );
+            } else {
+              return const SizedBox(
+                height: 80,
+                width: 80,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+          },
+        );
+      } else {
+        return Image.file(
+          File(file.path),
+          fit: BoxFit.cover,
+          height: 250,
+          width: 250,
+        );
+      }
+    } else {
+      // Video or unsupported type
+      return Container(
+        height: 250,
+        width: 250,
+        color: Colors.black12,
+        child: const Center(child: Icon(Icons.videocam, size: 60, color: Colors.blueGrey)),
+      );
+    }
   }
 
   Widget _buildDetailRow(String label, String? value) {

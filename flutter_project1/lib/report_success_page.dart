@@ -7,8 +7,9 @@ class ReportSuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The report object is passed via GoRouter's `extra` parameter
+    // Get the report object (may be null if navigated without extra)
     final report = GoRouterState.of(context).extra as HazardReport?;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Report Submitted"),
@@ -18,6 +19,8 @@ class ReportSuccessPage extends StatelessWidget {
             child: Image.asset(
               'assets/bZLl7vOopy4JrRaPcpkKDMxNPW_bQk5ALNocVql8tv5lMhq8NZsqYJkEu3pa4LIM-CVePCkPh3JgRXlmWMq2NtqAX3pRqnRn0-dzdx[1].jpg',
               width: 36,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.error, color: Colors.white),
             ),
           ),
         ],
@@ -26,23 +29,21 @@ class ReportSuccessPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 80),
-            SizedBox(height: 20),
-            Text(
+            const Icon(Icons.check_circle, color: Colors.green, size: 80),
+            const SizedBox(height: 20),
+            const Text(
               "Report submitted successfully!",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                minimumSize: const Size(200, 50), // Override the infinite width
+                minimumSize: const Size(200, 50),
               ),
-              onPressed: () {
-                if (report != null) {
-                  context.push('/viewReport', extra: report);
-                }
-              },
-              child: Text("View Report"),
+              onPressed: report != null
+                  ? () => context.push('/viewReport', extra: report)
+                  : null,
+              child: const Text("View Report"),
             ),
           ],
         ),

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,7 +12,7 @@ class HazardReportPage extends StatefulWidget {
   const HazardReportPage({super.key});
 
   @override
-  _HazardReportPageState createState() => _HazardReportPageState();
+  State<HazardReportPage> createState() => _HazardReportPageState();
 }
 
 class _HazardReportPageState extends State<HazardReportPage> {
@@ -20,10 +22,10 @@ class _HazardReportPageState extends State<HazardReportPage> {
   final TextEditingController descriptionController = TextEditingController();
 
   String? currentLocation;
-  XFile? mediaFile;
+  final List<XFile> mediaFiles = [];
   bool isRecording = false;
   bool isSubmitting = false;
-  
+
   final ApiService _apiService = ApiService();
 
   @override
@@ -70,7 +72,6 @@ class _HazardReportPageState extends State<HazardReportPage> {
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
-
     setState(() {
       currentLocation = "Lat: ${position.latitude}, Lng: ${position.longitude}";
     });
@@ -83,24 +84,20 @@ class _HazardReportPageState extends State<HazardReportPage> {
 
   Future<void> _pickMedia(ImageSource source, {bool isVideo = false}) async {
     final picker = ImagePicker();
-    XFile? file;
-    if (isVideo) {
-      file = await picker.pickVideo(source: source);
-    } else {
-      file = await picker.pickImage(source: source);
-    }
+    XFile? file = isVideo
+        ? await picker.pickVideo(source: source)
+        : await picker.pickImage(source: source);
     if (file != null) {
-      setState(() {
-        mediaFile = file;
-      });
+      setState(() => mediaFiles.add(file));
     }
   }
 
+  void _removeMedia(int index) {
+    setState(() => mediaFiles.removeAt(index));
+  }
+
   void _onVoiceButtonPressed() {
-    setState(() {
-      isRecording = !isRecording;
-    });
-    // In a real app, you would start/stop recording here.
+    setState(() => isRecording = !isRecording);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -115,57 +112,40 @@ class _HazardReportPageState extends State<HazardReportPage> {
   }
 
   Future<void> _submitReport() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    // Check if location is available
+    if (!_formKey.currentState!.validate()) return;
     if (currentLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please detect your location before submitting the report."),
+          content: Text(
+            "Please detect your location before submitting the report.",
+          ),
           backgroundColor: Colors.orange,
         ),
       );
       return;
     }
-
-    setState(() {
-      isSubmitting = true;
-    });
+    setState(() => isSubmitting = true);
 
     try {
       final report = HazardReport(
         hazardType: selectedHazard,
         description: descriptionController.text,
         location: currentLocation,
-        mediaFile: mediaFile,
+        mediaFiles: List<XFile>.from(mediaFiles),
       );
 
-      final result = await _apiService.submitHazardReport(
-        report: report,
-        // Add auth token here if you have authentication implemented
-        // authToken: 'your_auth_token_here',
-      );
+      final result = await _apiService.submitHazardReport(report: report);
 
       if (!mounted) return;
-
-      // Debug: Print the result to see what's actually happening
-      print('Submit result: $result');
-
       if (result['success']) {
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result['message']),
             backgroundColor: Colors.green,
           ),
         );
-
-        // Navigate to success page
         context.go('/success', extra: report);
       } else {
-        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result['message']),
@@ -175,7 +155,6 @@ class _HazardReportPageState extends State<HazardReportPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to submit report: ${e.toString()}"),
@@ -183,11 +162,7 @@ class _HazardReportPageState extends State<HazardReportPage> {
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          isSubmitting = false;
-        });
-      }
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
@@ -211,13 +186,10 @@ class _HazardReportPageState extends State<HazardReportPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<String>(
-                initialValue: selectedHazard,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a hazard.';
-                  }
-                  return null;
-                },
+                value: selectedHazard,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Please select a hazard.'
+                    : null,
                 decoration: const InputDecoration(
                   labelText: "Select Hazard",
                   border: OutlineInputBorder(),
@@ -228,11 +200,7 @@ class _HazardReportPageState extends State<HazardReportPage> {
                           DropdownMenuItem(value: hazard, child: Text(hazard)),
                     )
                     .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedHazard = value;
-                  });
-                },
+                onChanged: (value) => setState(() => selectedHazard = value),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -289,26 +257,88 @@ class _HazardReportPageState extends State<HazardReportPage> {
                     icon: const Icon(Icons.videocam),
                     label: const Text("Video"),
                   ),
-                  if (mediaFile != null)
-                    const Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Icon(Icons.check_circle, color: Colors.green),
-                    ),
                 ],
               ),
-              if (mediaFile != null && !mediaFile!.path.endsWith('.mp4'))
+              if (mediaFiles.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.file(
-                      File(mediaFile!.path),
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
-                    ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      for (int i = 0; i < mediaFiles.length; ++i)
+                        Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child:
+                                  mediaFiles[i].mimeType?.startsWith('image') ??
+                                      false
+                                  ? kIsWeb
+                                        ? FutureBuilder<Uint8List>(
+                                            future: mediaFiles[i].readAsBytes(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                      ConnectionState.done &&
+                                                  snapshot.hasData) {
+                                                return Image.memory(
+                                                  snapshot.data!,
+                                                  height: 80,
+                                                  width: 80,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              } else {
+                                                return const SizedBox(
+                                                  height: 80,
+                                                  width: 80,
+                                                  child: Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          )
+                                        : Image.file(
+                                            File(mediaFiles[i].path),
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                          )
+                                  : Container(
+                                      color: Colors.black12,
+                                      height: 80,
+                                      width: 80,
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.videocam,
+                                          size: 40,
+                                          color: Colors.blueGrey,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            GestureDetector(
+                              onTap: () => _removeMedia(i),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red,
+                                ),
+                                padding: const EdgeInsets.all(4.0),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
                 ),
+
               const SizedBox(height: 24),
               Center(
                 child: Column(
@@ -358,7 +388,9 @@ class _HazardReportPageState extends State<HazardReportPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             SizedBox(width: 8),
