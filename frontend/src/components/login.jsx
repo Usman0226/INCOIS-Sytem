@@ -22,7 +22,7 @@ export default function Login({ onLogin }) {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/auth/authority/login",
+        "https://incois-system.onrender.com/auth/authority/login",
         {
           email,
           password,

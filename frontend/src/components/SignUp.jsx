@@ -29,7 +29,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/auth/authority/register", {
+      const res = await axios.post("https://incois-system.onrender.com/auth/authority/register", {
         name,
         email,
         organization,
