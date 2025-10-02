@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import SignUp from "./components/SignUp.jsx";
 import Login from "./components/login.jsx"
-import HazardDashboard from "./components/HazardDashboard";
+import HazardDashboard from "./components/HazardDashboard.jsx";
 
 function App() {
   const [scientist, setScientist] = useState(null);
